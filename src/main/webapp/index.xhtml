@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <h:head>
+        <title>WebCRUD</title>
+    </h:head>
+    <h:body>
+        <h2>Adicionar Hiperlink</h2>
+        <h:form id="formAdd">
+            <h:panelGrid columns="2">
+                <h:outputLabel value="Nome: "/>
+                <h:inputText value="#{hiperlinkBean.hiperlink.name}" required="true"/>
+
+                <h:outputLabel value="URL: "/>
+                <h:inputText value="#{hiperlinkBean.hiperlink.url}" required="true"/>
+
+                <h:outputLabel value="Suas Notas: "/>
+                <h:inputTextarea value="#{hiperlinkBean.hiperlink.notes}" rows="4" cols="40"/>
+
+                <h:outputLabel value="Cor: "/>
+                <h:selectOneMenu value="#{hiperlinkBean.hiperlink.color}">
+                    <f:selectItem itemValue="" itemLabel="---Escolha---"/>
+                    <f:selectItems value="#{hiperlinkBean.colors}" var="c" itemValue="#{c}" itemLabel="#{c}"/>
+                </h:selectOneMenu>
+            </h:panelGrid>
+            <br />
+            <h:commandButton value="Salvar"
+                             action="#{hiperlinkBean.salvar()}" />
+        </h:form>
+        <hr />
+        <h2>Lista de Hiperlinks</h2>
+        <h:panelGrid id="lista">
+            <h:form id="formTabela">
+                <h:dataTable value="#{hiperlinkBean.lista}" var="h" border="1">
+                    <h:column>
+                        <f:facet name="header">Nome</f:facet>
+                        #{h.name}
+                    </h:column>
+
+                    <h:column>
+                        <f:facet name="header">URL</f:facet>
+                        #{h.url}
+                    </h:column>
+
+                    <h:column>
+                        <f:facet name="header">Cor</f:facet>
+                        #{h.color}
+                    </h:column>
+
+                    <h:column>
+                        <f:facet name="header">Ações</f:facet>
+                        <h:commandButton value="Remover" action="#{hiperlinkBean.remover(h)}"/>
+                    </h:column>
+                </h:dataTable>
+            </h:form>
+        </h:panelGrid>
+    </h:body>
+</html>
+

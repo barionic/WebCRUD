@@ -28,6 +28,15 @@ public class HiperlinkBean implements Serializable{
     }
 
     public void salvar(){
+        String url = hiperlink.getUrl();
+        if(url != null && !url.isBlank()){
+          url = url.trim();
+          if (!url.startsWith("http://") && !url.startsWith("https://")){
+              url = "https://" + url;
+          }
+          hiperlink.setUrl(url);
+        }
+
         facade.salvar(hiperlink);
         hiperlink = new Hiperlink();
         lista = facade.listarTodos();

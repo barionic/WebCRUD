@@ -36,12 +36,14 @@
                 <h:dataTable value="#{hiperlinkBean.lista}" var="h" border="1">
                     <h:column>
                         <f:facet name="header">Nome</f:facet>
-                        #{h.name}
+                        <h:outputLink value="#{h.url}" target="_blank">
+                            <h:outputText value="#{h.name}"/>
+                        </h:outputLink>
                     </h:column>
 
                     <h:column>
-                        <f:facet name="header">URL</f:facet>
-                        #{h.url}
+                        <f:facet name="header">Notas</f:facet>
+                        #{h.notes}
                     </h:column>
 
                     <h:column>

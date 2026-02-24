@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:f="http://xmlns.jcp.org/jsf/core">
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
 
     <h:head>
         <title>WebCRUD</title>
@@ -21,9 +22,31 @@
 
                 <h:outputLabel value="Cor: "/>
                 <h:selectOneMenu value="#{hiperlinkBean.hiperlink.color}">
-                    <f:selectItem itemValue="" itemLabel="---Escolha---"/>
+                    <f:selectItem itemValue="" itemLabel="---Default: Sem Cor---"/>
                     <f:selectItems value="#{hiperlinkBean.colors}" var="c" itemValue="#{c}" itemLabel="#{c}"/>
                 </h:selectOneMenu>
+
+                <h:outputLabel value="Grupo: "/>
+                <h:selectOneMenu value="#{hiperlinkBean.grupoId}">
+                    <f:selectItem itemLabel="---Escolha---" itemValue="#{null}"/>
+                    <f:selectItems value="#{hiperlinkBean.grupos}" var="g" itemValue="#{g.id}" itemLabel="#{g.grupoName}" />
+                </h:selectOneMenu>
+
+                <h:outputLink value="grupo.xhtml" target="_blank">
+                    Gerenciar Grupo
+                </h:outputLink>
+                <br />
+
+                <h:outputLabel value="Tags:"/>
+                <h:selectManyCheckbox value="#{hiperlinkBean.tagIds}">
+                    <f:selectItems value="#{hiperlinkBean.tags}" var="t" itemValue="#{t.id}" itemLabel="#{t.tagName}"/>
+                </h:selectManyCheckbox>
+
+                <h:outputLink value="tag.xhtml" target="_blank">
+                    Gerenciar Tags
+                </h:outputLink>
+                <br />
+
             </h:panelGrid>
             <br />
             <h:commandButton value="Salvar"
@@ -44,6 +67,16 @@
                     <h:column>
                         <f:facet name="header">Notas</f:facet>
                         #{h.notes}
+                    </h:column>
+
+                    <h:column>
+                        <f:facet name="header">Grupo</f:facet>
+                        #{h.grupo != null ? h.grupo.grupoName : '-'}
+                    </h:column>
+
+                    <h:column>
+                        <f:facet name="header">Tags</f:facet>
+                        #{h.tags.stream().map(t -> t.tagName).toList()}
                     </h:column>
 
                     <h:column>

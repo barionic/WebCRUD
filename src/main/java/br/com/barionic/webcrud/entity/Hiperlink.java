@@ -2,6 +2,7 @@ package br.com.barionic.webcrud.entity;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
+import java.util.List;
 
 @Entity
 @Table(name= "hiperlinks")
@@ -24,6 +25,19 @@ public class Hiperlink implements Serializable{
     @Column(length = 30)
     private String color;
 
+    @ManyToOne
+    @JoinColumn(name = "grupo_id")
+    private Grupo grupo;
+
+    @ManyToMany
+    @JoinTable(
+            name = "hiperlink_tag",
+            joinColumns = @JoinColumn(name = "hiperlink_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private List<Tag> tags;
+
+    // ==== Getters & Setters ====
     public Long getId() {
         return id;
     }
@@ -58,5 +72,21 @@ public class Hiperlink implements Serializable{
 
     public void setColor(String color) {
         this.color = color;
+    }
+
+    public Grupo getGrupo() {
+        return grupo;
+    }
+
+    public void setGrupo(Grupo grupo) {
+        this.grupo = grupo;
+    }
+
+    public List<Tag> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<Tag> tags) {
+        this.tags = tags;
     }
 }

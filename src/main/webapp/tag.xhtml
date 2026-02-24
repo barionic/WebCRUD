@@ -9,7 +9,7 @@
 <h:body>
     <h2>Criar Tag</h2>
     <h:form>
-        <h:outputText value="#{tagBean}" />
+        <h:outputLabel value="Nome da Tag: "/>
         <h:inputText value="#{tagBean.tag.tagName}"/>
         <h:commandButton value="Salvar" action="#{tagBean.salvar}"/>
         <hr />

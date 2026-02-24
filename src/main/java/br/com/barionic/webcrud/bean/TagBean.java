@@ -3,6 +3,8 @@ package br.com.barionic.webcrud.bean;
 import br.com.barionic.webcrud.entity.Tag;
 import br.com.barionic.webcrud.facade.TagFacade;
 import jakarta.annotation.PostConstruct;
+import jakarta.faces.application.FacesMessage;
+import jakarta.faces.context.FacesContext;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -27,6 +29,13 @@ public class TagBean implements Serializable {
     }
 
     public void salvar(){
+        if(facade.existeOutroComMesmoNome(tag.getTagName(), tag.getId())) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Já existe uma tag com esse nome.", null));
+            return;
+        }
+
         facade.salvar(tag);
         tag = new Tag();
         lista = facade.listarTodos();

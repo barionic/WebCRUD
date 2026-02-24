@@ -11,7 +11,7 @@
         <class>br.com.barionic.webcrud.entity.Hiperlink</class>
         <properties>
             <property name="jakarta.persistence.schema-generation.database.action"
-                      value="create-or-extend-tables"/>
+                      value="drop-and-create"/>
         </properties>
     </persistence-unit>
 </persistence>

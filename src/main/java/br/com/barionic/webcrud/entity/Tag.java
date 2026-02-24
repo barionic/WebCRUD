@@ -6,12 +6,14 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity
+@Table(name = "tag")
 public class Tag {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, unique = true)
     private String tagName;
 
     @ManyToMany(mappedBy = "tags")

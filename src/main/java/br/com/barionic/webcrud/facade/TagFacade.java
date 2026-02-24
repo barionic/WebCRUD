@@ -4,6 +4,7 @@ import br.com.barionic.webcrud.entity.Tag;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
 
 import java.util.List;
 
@@ -34,6 +35,18 @@ public class TagFacade {
 
     public List<Tag> listarTodos(){
         return em.createQuery("SELECT t FROM Tag t", Tag.class).getResultList();
+    }
+
+    public boolean existeOutroComMesmoNome(String nome, Long idAtual){
+        String jpql = "SELECT t FROM Tag t WHERE t.tagName = :nome";
+        if(idAtual != null){
+            jpql += "AND t.id <> :idAtual";
+        }
+        TypedQuery<Tag> query = em.createQuery(jpql, Tag.class).setParameter("nome", nome);
+        if (idAtual != null){
+            query.setParameter("idAtual", idAtual);
+        }
+        return !query.getResultList().isEmpty();
     }
 
 }

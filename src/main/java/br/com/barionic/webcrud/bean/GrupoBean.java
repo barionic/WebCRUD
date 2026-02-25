@@ -35,6 +35,7 @@ public class GrupoBean implements Serializable {
                     "Já existe um grupo com esse nome.", null));
             return;
         }
+
         facade.salvar(grupo);
         grupo = new Grupo();
         lista = facade.listarTodos();

@@ -6,8 +6,7 @@ import java.util.List;
 
 public abstract class GenericDAO<T> {
 
-    @PersistenceContext(unitName = "webcrudPU")
-    protected EntityManager em;
+    protected abstract EntityManager getEntityManager();
 
     private Class<T> entityClass;
 
@@ -16,25 +15,25 @@ public abstract class GenericDAO<T> {
     }
 
     public void create(T entity){
-        em.persist(entity);
+        getEntityManager().persist(entity);
     }
 
     public T update(T entity){
-        return em.merge(entity);
+        return getEntityManager().merge(entity);
     }
 
     public void remove(T entity){
-        em.remove(em.merge(entity));
+        getEntityManager().remove(getEntityManager().merge(entity));
     }
 
     public T find(Long id){
-        return em.find(entityClass, id);
+        return getEntityManager().find(entityClass, id);
     }
 
     public List<T> findAll() {
-        return em.createQuery(
-                "SELECT e FROM " + entityClass.getSimpleName() + " e",
-                entityClass
-        ).getResultList();
+        return getEntityManager().createQuery(
+                "SELECT e FROM " + entityClass.getSimpleName() + " e", entityClass)
+
+        .getResultList();
     }
 }

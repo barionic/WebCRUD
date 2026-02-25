@@ -49,8 +49,6 @@ public class TagBean implements Serializable {
     // ==== Getters & Setters ====
     public TagFacade getFacade() {return facade;}
 
-    public void setFacade(TagFacade facade) {this.facade = facade;}
-
     public Tag getTag() {return tag;}
 
     public void setTag(Tag tag) {this.tag = tag;}

@@ -1,52 +1,43 @@
 package br.com.barionic.webcrud.facade;
 
+import br.com.barionic.webcrud.dao.TagDAO;
 import br.com.barionic.webcrud.entity.Tag;
+import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.TypedQuery;
 
 import java.util.List;
 
 @Stateless
 public class TagFacade {
 
-    @PersistenceContext
-    private EntityManager em;
+   @EJB
+   private TagDAO dao;
 
     public void salvar(Tag tag){
         if(tag.getId() == null){
-            em.persist(tag);
+            dao.create(tag);
         } else{
-            em.merge(tag);
+            dao.update(tag);
         }
     }
 
     public void remover(Long id){
-        Tag tag = em.find(Tag.class, id);
+        Tag tag = dao.find(id);
         if(tag != null){
-            em.remove(tag);
+            dao.remove(tag);
         }
     }
 
     public List<Tag> buscarPorIds(List<Long> ids){
-        return em.createQuery("SELECT t FROM Tag t WHERE t.id IN :ids", Tag.class).setParameter("ids", ids).getResultList();
+        return dao.buscarPorIds(ids);
     }
 
     public List<Tag> listarTodos(){
-        return em.createQuery("SELECT t FROM Tag t", Tag.class).getResultList();
+        return dao.findAll();
     }
 
     public boolean existeOutroComMesmoNome(String nome, Long idAtual){
-        String jpql = "SELECT t FROM Tag t WHERE t.tagName = :nome";
-        if(idAtual != null){
-            jpql += "AND t.id <> :idAtual";
-        }
-        TypedQuery<Tag> query = em.createQuery(jpql, Tag.class).setParameter("nome", nome);
-        if (idAtual != null){
-            query.setParameter("idAtual", idAtual);
-        }
-        return !query.getResultList().isEmpty();
+        return dao.existeOutroComMesmoNome(nome, idAtual);
     }
 
 }

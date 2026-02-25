@@ -2,18 +2,17 @@ package br.com.barionic.webcrud.facade;
 
 import br.com.barionic.webcrud.dao.HiperlinkDAO;
 import br.com.barionic.webcrud.entity.Hiperlink;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
+import jakarta.ejb.EJB;
+import jakarta.ejb.Stateless;
+
 import java.util.List;
 
-@ApplicationScoped
+@Stateless
 public class HiperlinkFacade {
 
-    @Inject
+    @EJB
     private HiperlinkDAO dao;
 
-    @Transactional
     public void salvar(Hiperlink hiperlink){
         if (hiperlink.getId() == null){
             dao.create(hiperlink);
@@ -22,13 +21,21 @@ public class HiperlinkFacade {
         }
     }
 
-    @Transactional
-    public void remover(Hiperlink hiperlink){
-        dao.remove(hiperlink);
+    public void remover(Long id){
+        Hiperlink hiperlink = dao.find(id);
+        if(hiperlink != null){
+            dao.remove(hiperlink);
+        }
     }
+
+    public Hiperlink buscarPorId(Long id){ return dao.find(id); }
 
     public List<Hiperlink> listarTodos(){
         return dao.findAll();
+    }
+
+    public boolean existeOutroComMesmoNome(String nome, Long idAtual){
+        return dao.existeOutroComMesmoNome(nome, idAtual);
     }
 
 }

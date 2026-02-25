@@ -10,6 +10,8 @@ import jakarta.annotation.PostConstruct;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import jakarta.faces.application.FacesMessage;
+import jakarta.faces.context.FacesContext;
 
 import java.io.Serializable;
 import java.util.List;
@@ -55,6 +57,13 @@ public class HiperlinkBean implements Serializable{
           hiperlink.setUrl(url);
         }
 
+        if(facade.existeOutroComMesmoNome(hiperlink.getName(), hiperlink.getId())){
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Já existe um hiperlink com esse nome.", null));
+            return;
+        }
+
         if(grupoId != null){
             Grupo grupoSelecionado = grupoFacade.buscarPorId(grupoId);
             hiperlink.setGrupo(grupoSelecionado);
@@ -70,7 +79,7 @@ public class HiperlinkBean implements Serializable{
     }
 
     public void remover(Hiperlink h){
-        facade.remover(h);
+        facade.remover(h.getId());
         lista = facade.listarTodos();
     }
 
@@ -89,7 +98,7 @@ public class HiperlinkBean implements Serializable{
 
     public void setGrupoId(Long grupoId) {this.grupoId = grupoId;}
 
-    public List<Long> gettagIds() {return tagIds;}
+    public List<Long> getTagIds() {return tagIds;}
 
-    public void settagIds(List<Long> tagIds) {this.tagIds = tagIds;}
+    public void setTagIds(List<Long> tagIds) {this.tagIds = tagIds;}
 }

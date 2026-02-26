@@ -56,6 +56,15 @@
         <h2>Lista de Hiperlinks</h2>
         <h:panelGrid id="lista">
             <h:form id="formTabela">
+                <!-- Busca e Filtro -->
+                <h:inputText value="#{hiperlinkBean.filtroNome}"/>
+                <h:selectOneMenu value="#{hiperlinkBean.filtroGrupoId}">
+                    <f:selectItem itemLabel="Todos" itemValue="#{null}"/>
+                    <f:selectItems value="#{hiperlinkBean.grupos}" var="g" itemValue="#{g.id}" itemLabel="#{g.grupoName}"/>
+                </h:selectOneMenu>
+                <h:commandButton value="Buscar" action="#{hiperlinkBean.buscar}"/>
+                <br />
+                <br />
                 <h:dataTable value="#{hiperlinkBean.lista}" var="h" border="1">
                     <h:column>
                         <f:facet name="header">Nome</f:facet>

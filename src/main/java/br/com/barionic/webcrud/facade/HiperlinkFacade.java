@@ -66,6 +66,10 @@ public class HiperlinkFacade {
         }
     }
 
+    public List<Hiperlink> buscarComFiltro(String nome, Long grupoId, Long tagId){
+        return dao.buscarComFiltro(nome, grupoId, tagId);
+    }
+
     public void remover(Long id){
         Hiperlink hiperlink = dao.find(id);
         if(hiperlink != null){

@@ -1,6 +1,7 @@
 package br.com.barionic.webcrud.bean;
 
 import br.com.barionic.webcrud.entity.Grupo;
+import br.com.barionic.webcrud.exception.RegraNegocioException;
 import br.com.barionic.webcrud.facade.GrupoFacade;
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.application.FacesMessage;
@@ -29,16 +30,15 @@ public class GrupoBean implements Serializable {
     }
 
     public void salvar(){
-        if (facade.existeOutroComMesmoNome(grupo.getGrupoName(), grupo.getId())) {
+        try {
+            facade.salvar(grupo);
+            grupo = new Grupo();
+            lista = facade.listarTodos();
+        } catch(RegraNegocioException e){
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Já existe um grupo com esse nome.", null));
-            return;
+                            e.getMessage(), null));
         }
-
-        facade.salvar(grupo);
-        grupo = new Grupo();
-        lista = facade.listarTodos();
     }
 
     public void remover(Grupo g){

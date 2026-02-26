@@ -2,6 +2,7 @@ package br.com.barionic.webcrud.facade;
 
 import br.com.barionic.webcrud.dao.TagDAO;
 import br.com.barionic.webcrud.entity.Tag;
+import br.com.barionic.webcrud.exception.RegraNegocioException;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 
@@ -14,10 +15,17 @@ public class TagFacade {
    private TagDAO dao;
 
     public void salvar(Tag tag){
+        validarNomeUnico(tag);
         if(tag.getId() == null){
             dao.create(tag);
         } else{
             dao.update(tag);
+        }
+    }
+
+    private void validarNomeUnico(Tag tag){
+        if(dao.existeOutroComMesmoNome(tag.getTagName(), tag.getId())){
+            throw new RegraNegocioException("Já existe uma tag com esse nome.");
         }
     }
 
@@ -34,10 +42,6 @@ public class TagFacade {
 
     public List<Tag> listarTodos(){
         return dao.findAll();
-    }
-
-    public boolean existeOutroComMesmoNome(String nome, Long idAtual){
-        return dao.existeOutroComMesmoNome(nome, idAtual);
     }
 
 }

@@ -24,15 +24,17 @@ public class HiperlinkDAO extends GenericDAO<Hiperlink>{
     }
 
     public boolean existeOutroComMesmoNome(String nome, Long idAtual){
-        String jpql = "SELECT h FROM Hiperlink h WHERE h.name = :nome";
+        String jpql = "SELECT COUNT(h) FROM Hiperlink h WHERE h.name = :nome";
         if(idAtual != null){
             jpql += " AND h.id <> :idAtual";
         }
-        TypedQuery<Hiperlink> query = getEntityManager().createQuery(jpql, Hiperlink.class).setParameter("nome", nome);
+        var query = getEntityManager().createQuery(jpql, Long.class).setParameter("nome", nome);
+        //TypedQuery<Hiperlink> query = getEntityManager().createQuery(jpql, Hiperlink.class).setParameter("nome", nome);
         if(idAtual != null){
             query.setParameter("idAtual", idAtual);
         }
-        return !query.getResultList().isEmpty();
+        return query.getSingleResult()>0;
+        //return !query.getResultList().isEmpty();
     }
 
 }

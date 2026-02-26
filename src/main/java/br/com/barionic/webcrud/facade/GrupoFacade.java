@@ -1,8 +1,8 @@
 package br.com.barionic.webcrud.facade;
 
-
 import br.com.barionic.webcrud.dao.GrupoDAO;
 import br.com.barionic.webcrud.entity.Grupo;
+import br.com.barionic.webcrud.exception.RegraNegocioException;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 
@@ -15,10 +15,17 @@ public class GrupoFacade {
     private GrupoDAO dao;
 
     public void salvar(Grupo grupo){
-        if (grupo.getId() == null){
+        validarNomeUnico(grupo);
+        if(grupo.getId() == null){
             dao.create(grupo);
-        } else{
+        }else{
             dao.update(grupo);
+        }
+    }
+
+    private void validarNomeUnico(Grupo grupo){
+        if (dao.existeOutroComMesmoNome(grupo.getGrupoName(), grupo.getId())){
+            throw new RegraNegocioException("Já existe um grupo com esse nome.");
         }
     }
 
@@ -37,7 +44,4 @@ public class GrupoFacade {
         return dao.findAll();
     }
 
-    public boolean existeOutroComMesmoNome(String nome, Long idAtual){
-        return dao.existeOutroComMesmoNome(nome, idAtual);
-    }
 }

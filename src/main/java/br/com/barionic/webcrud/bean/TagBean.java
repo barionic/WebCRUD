@@ -1,6 +1,7 @@
 package br.com.barionic.webcrud.bean;
 
 import br.com.barionic.webcrud.entity.Tag;
+import br.com.barionic.webcrud.exception.RegraNegocioException;
 import br.com.barionic.webcrud.facade.TagFacade;
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.application.FacesMessage;
@@ -29,16 +30,15 @@ public class TagBean implements Serializable {
     }
 
     public void salvar(){
-        if(facade.existeOutroComMesmoNome(tag.getTagName(), tag.getId())) {
+        try{
+            facade.salvar(tag);
+            tag = new Tag();
+            lista = facade.listarTodos();
+        } catch (RegraNegocioException e){
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Já existe uma tag com esse nome.", null));
-            return;
+                            e.getMessage(), null));
         }
-
-        facade.salvar(tag);
-        tag = new Tag();
-        lista = facade.listarTodos();
     }
 
     public void remover(Tag t){
@@ -47,13 +47,8 @@ public class TagBean implements Serializable {
     }
 
     // ==== Getters & Setters ====
-    public TagFacade getFacade() {return facade;}
-
     public Tag getTag() {return tag;}
-
-    public void setTag(Tag tag) {this.tag = tag;}
 
     public List<Tag> getLista() {return lista;}
 
-    public void setLista(List<Tag> lista) {this.lista = lista;}
 }

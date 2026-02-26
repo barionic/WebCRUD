@@ -22,8 +22,9 @@ public class Hiperlink implements Serializable{
     @Column(length = 5000)
     private String notes;
 
-    @Column(length = 30)
-    private String color;
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private Cor color = Cor.PRETO;
 
     @ManyToOne
     @JoinColumn(name = "grupo_id")
@@ -66,11 +67,11 @@ public class Hiperlink implements Serializable{
         this.notes = notes;
     }
 
-    public String getColor() {
+    public Cor getColor() {
         return color;
     }
 
-    public void setColor(String color) {
+    public void setColor(Cor color) {
         this.color = color;
     }
 

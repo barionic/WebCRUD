@@ -1,17 +1,19 @@
 package br.com.barionic.webcrud.bean;
 
+import br.com.barionic.webcrud.entity.Cor;
 import br.com.barionic.webcrud.entity.Grupo;
 import br.com.barionic.webcrud.entity.Hiperlink;
 import br.com.barionic.webcrud.entity.Tag;
+import br.com.barionic.webcrud.exception.RegraNegocioException;
 import br.com.barionic.webcrud.facade.GrupoFacade;
 import br.com.barionic.webcrud.facade.HiperlinkFacade;
 import br.com.barionic.webcrud.facade.TagFacade;
 import jakarta.annotation.PostConstruct;
+import jakarta.faces.application.FacesMessage;
+import jakarta.faces.context.FacesContext;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-import jakarta.faces.application.FacesMessage;
-import jakarta.faces.context.FacesContext;
 
 import java.io.Serializable;
 import java.util.List;
@@ -19,12 +21,10 @@ import java.util.List;
 @Named("hiperlinkBean")
 @ViewScoped
 public class HiperlinkBean implements Serializable{
-    private List<String> colors = List.of("Azul", "Vermelho", "Amarelo", "Laranja", "Roxo", "Verde");
     private List<Grupo> grupos;
     private Long grupoId;
     private List<Tag> tags;
     private List<Long> tagIds;
-
 
     @Inject
     private HiperlinkFacade facade;
@@ -42,40 +42,20 @@ public class HiperlinkBean implements Serializable{
     public void init(){
         hiperlink = new Hiperlink();
         lista = facade.listarTodos();
-
         grupos = grupoFacade.listarTodos();
         tags = tagFacade.listarTodos();
     }
 
     public void salvar(){
-        String url = hiperlink.getUrl();
-        if(url != null && !url.isBlank()){
-          url = url.trim();
-          if (!url.startsWith("http://") && !url.startsWith("https://")){
-              url = "https://" + url;
-          }
-          hiperlink.setUrl(url);
-        }
-
-        if(facade.existeOutroComMesmoNome(hiperlink.getName(), hiperlink.getId())){
+        try{
+            facade.salvar(hiperlink, grupoId, tagIds);
+            hiperlink = new Hiperlink();
+            lista = facade.listarTodos();
+        } catch (RegraNegocioException e){
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Já existe um hiperlink com esse nome.", null));
-            return;
+                            e.getMessage(), null));
         }
-
-        if(grupoId != null){
-            Grupo grupoSelecionado = grupoFacade.buscarPorId(grupoId);
-            hiperlink.setGrupo(grupoSelecionado);
-        }
-        if(tagIds != null && !tagIds.isEmpty()){
-          List<Tag> tagsSelecionadas = tagFacade.buscarPorIds(tagIds);
-          hiperlink.setTags(tagsSelecionadas);
-        }
-
-        facade.salvar(hiperlink);
-        hiperlink = new Hiperlink();
-        lista = facade.listarTodos();
     }
 
     public void remover(Hiperlink h){
@@ -84,21 +64,23 @@ public class HiperlinkBean implements Serializable{
     }
 
     // ==== Getters & Setters ====
-    public List<String> getColors(){return colors;}
-
     public Hiperlink getHiperlink() {return hiperlink;}
 
     public List<Hiperlink> getLista() {return lista;}
 
-    public List<Grupo> getGrupos(){return grupos;}
-
-    public List<Tag> getTags(){return tags;}
+    public List<Grupo> getGrupos() {return grupos;}
 
     public Long getGrupoId() {return grupoId;}
 
     public void setGrupoId(Long grupoId) {this.grupoId = grupoId;}
 
+    public List<Tag> getTags() {return tags;}
+
     public List<Long> getTagIds() {return tagIds;}
 
     public void setTagIds(List<Long> tagIds) {this.tagIds = tagIds;}
+
+    public Cor[] getColors(){
+        return Cor.values();
+    }
 }

@@ -59,8 +59,16 @@
                 <!-- Busca e Filtro -->
                 <h:inputText value="#{hiperlinkBean.filtroNome}"/>
                 <h:selectOneMenu value="#{hiperlinkBean.filtroGrupoId}">
-                    <f:selectItem itemLabel="Todos" itemValue="#{null}"/>
+                    <f:selectItem itemLabel="Todos Grupos" itemValue="#{null}"/>
                     <f:selectItems value="#{hiperlinkBean.grupos}" var="g" itemValue="#{g.id}" itemLabel="#{g.grupoName}"/>
+                </h:selectOneMenu>
+                <h:selectOneMenu value="#{hiperlinkBean.filtroTagId}">
+                    <f:selectItem itemLabel="Todas Tags" itemValue="#{null}"/>
+                    <f:selectItems value="#{hiperlinkBean.tags}" var="t" itemValue="#{t.id}" itemLabel="#{t.tagName}"/>
+                </h:selectOneMenu>
+                <h:selectOneMenu value="#{hiperlinkBean.filtroCor}">
+                    <f:selectItem itemLabel="Todas Cores" itemValue="#{null}"/>
+                    <f:selectItems value="#{hiperlinkBean.colors}" var="c" itemValue="#{c}" itemLabel="#{c.label}" />
                 </h:selectOneMenu>
                 <h:commandButton value="Buscar" action="#{hiperlinkBean.buscar}"/>
                 <br />

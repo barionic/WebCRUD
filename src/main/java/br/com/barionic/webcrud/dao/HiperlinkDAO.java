@@ -1,5 +1,6 @@
 package br.com.barionic.webcrud.dao;
 
+import br.com.barionic.webcrud.entity.Cor;
 import br.com.barionic.webcrud.entity.Hiperlink;
 import jakarta.ejb.Stateless;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -37,16 +38,23 @@ public class HiperlinkDAO extends GenericDAO<Hiperlink>{
         return query.getSingleResult()>0;
     }
 
-    public List<Hiperlink> buscarComFiltro(String nome, Long grupoId, Long tagId){
-        StringBuilder jpql = new StringBuilder("SELECT h FROM Hiperlink h WHERE 1=1");
+    public List<Hiperlink> buscarComFiltro(String nome, Long grupoId, Long tagId, Cor cor){
+        StringBuilder jpql = new StringBuilder("SELECT DISTINCT h FROM Hiperlink h ");
+        if (tagId != null){
+            jpql.append("JOIN h.tags t ");
+        }
+        jpql.append("WHERE 1=1 ");
         if (nome != null && !nome.isBlank()){
-            jpql.append(" AND LOWER(h.name) LIKE LOWER(:nome)");
+            jpql.append("AND LOWER(h.name) LIKE LOWER(:nome) ");
         }
         if (grupoId != null){
-            jpql.append(" AND h.grupo.id = :grupoId");
+            jpql.append("AND h.grupo.id = :grupoId ");
         }
         if (tagId != null){
-            jpql.append(" AND EXISTS (SELECT t FROM h.tags WHERE t.id = :tagId)");
+            jpql.append("AND t.id = :tagId ");
+        }
+        if (cor != null){
+            jpql.append("AND h.color = :cor ");
         }
         var query = em.createQuery(jpql.toString(), Hiperlink.class);
         if (nome != null && !nome.isBlank()){
@@ -57,6 +65,9 @@ public class HiperlinkDAO extends GenericDAO<Hiperlink>{
         }
         if(tagId != null){
             query.setParameter("tagId", tagId);
+        }
+        if(cor != null){
+            query.setParameter("cor", cor);
         }
         return query.getResultList();
     }

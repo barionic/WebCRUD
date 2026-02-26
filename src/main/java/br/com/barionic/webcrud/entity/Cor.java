@@ -10,14 +10,14 @@ public enum Cor {
     ROXO("Roxo"),
     PRETO("Preto");
 
-    private final String descricao;
+    private final String label;
 
-    Cor(String descricao){
-        this.descricao = descricao;
+    Cor(String label){
+        this.label = label;
     }
 
-    public String getDescricao(){
-        return descricao;
+    public String getlabel(){
+        return label;
     }
 
 }

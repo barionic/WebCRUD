@@ -30,6 +30,7 @@ public class HiperlinkBean implements Serializable{
     private String filtroNome;
     private Long filtroGrupoId;
     private Long filtroTagId;
+    private Cor filtroCor;
 
     @Inject
     private HiperlinkFacade facade;
@@ -77,7 +78,7 @@ public class HiperlinkBean implements Serializable{
     }
 
     public void buscar(){
-        lista = facade.buscarComFiltro(filtroNome, filtroGrupoId, filtroTagId);
+        lista = facade.buscarComFiltro(filtroNome, filtroGrupoId, filtroTagId, filtroCor);
     }
 
     // ==== Getters & Setters ====
@@ -105,6 +106,10 @@ public class HiperlinkBean implements Serializable{
     public Long getFiltroGrupoId() {return filtroGrupoId;}
 
     public Long getFiltroTagId() {return filtroTagId;}
+
+    public Cor getFiltroCor() {return filtroCor;}
+
+    public void setFiltroCor(Cor filtroCor) {this.filtroCor = filtroCor;}
 
     public void setFiltroNome(String filtroNome) {this.filtroNome = filtroNome;}
 

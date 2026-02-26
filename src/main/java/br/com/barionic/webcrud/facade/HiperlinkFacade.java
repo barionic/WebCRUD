@@ -3,6 +3,7 @@ package br.com.barionic.webcrud.facade;
 import br.com.barionic.webcrud.dao.GrupoDAO;
 import br.com.barionic.webcrud.dao.HiperlinkDAO;
 import br.com.barionic.webcrud.dao.TagDAO;
+import br.com.barionic.webcrud.entity.Cor;
 import br.com.barionic.webcrud.entity.Hiperlink;
 import br.com.barionic.webcrud.exception.RegraNegocioException;
 import jakarta.ejb.EJB;
@@ -66,8 +67,8 @@ public class HiperlinkFacade {
         }
     }
 
-    public List<Hiperlink> buscarComFiltro(String nome, Long grupoId, Long tagId){
-        return dao.buscarComFiltro(nome, grupoId, tagId);
+    public List<Hiperlink> buscarComFiltro(String nome, Long grupoId, Long tagId, Cor cor){
+        return dao.buscarComFiltro(nome, grupoId, tagId, cor);
     }
 
     public void remover(Long id){

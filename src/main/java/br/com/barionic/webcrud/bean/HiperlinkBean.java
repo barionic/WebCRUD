@@ -81,6 +81,11 @@ public class HiperlinkBean implements Serializable{
         lista = facade.buscarComFiltro(filtroNome, filtroGrupoId, filtroTagId, filtroCor);
     }
 
+    public void atualizarOrdem(Hiperlink h){
+        facade.atualizar(h);
+        lista = facade.listarTodos();
+    }
+
     // ==== Getters & Setters ====
     public Hiperlink getHiperlink() {return hiperlink;}
 

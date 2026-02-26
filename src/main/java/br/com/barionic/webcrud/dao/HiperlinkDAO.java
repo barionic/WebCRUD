@@ -20,7 +20,6 @@ public class HiperlinkDAO extends GenericDAO<Hiperlink>{
     @PersistenceContext(unitName = "webcrudPU")
     private EntityManager em;
 
-
     @Override
     protected EntityManager getEntityManager() {
         return em;
@@ -36,6 +35,18 @@ public class HiperlinkDAO extends GenericDAO<Hiperlink>{
             query.setParameter("idAtual", idAtual);
         }
         return query.getSingleResult()>0;
+    }
+
+    public List<Hiperlink> findAllOrdenado(){
+        return em.createQuery("SELECT h FROM Hiperlink h ORDER BY h.ordem ASC", Hiperlink.class).getResultList();
+    }
+
+    public Integer buscarMaiorOrdem(){
+        return em.createQuery("SELECT MAX(h.ordem) FROM Hiperlink h", Integer.class).getSingleResult();
+    }
+
+    public void atualizar(Hiperlink h){
+        em.merge(h);
     }
 
     public List<Hiperlink> buscarComFiltro(String nome, Long grupoId, Long tagId, Cor cor){

@@ -73,7 +73,13 @@
                 <h:commandButton value="Buscar" action="#{hiperlinkBean.buscar}"/>
                 <br />
                 <br />
-                <h:dataTable value="#{hiperlinkBean.lista}" var="h" border="1">
+                <h:dataTable id="tabelaResultados" value="#{hiperlinkBean.lista}" var="h" border="1">
+                    <h:column>
+                        <f:facet name="header">Ordem</f:facet>
+                        <h:inputText value="{h.ordem}" style="width:50px">
+                            <f:ajax event="blur" listener="#{hiperlinkBean.atualizarOrdem(h)}" render="tabelaResultados"/>
+                        </h:inputText>
+                    </h:column>
                     <h:column>
                         <f:facet name="header">Nome</f:facet>
                         <h:outputLink value="#{h.url}" target="_blank">

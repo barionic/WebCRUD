@@ -30,6 +30,9 @@ public class Hiperlink implements Serializable{
     @JoinColumn(name = "grupo_id")
     private Grupo grupo;
 
+    @Column(name = "ordem")
+    private Integer ordem;
+
     @ManyToMany
     @JoinTable(
             name = "hiperlink_tag",
@@ -90,4 +93,8 @@ public class Hiperlink implements Serializable{
     public void setTags(List<Tag> tags) {
         this.tags = tags;
     }
+
+    public Integer getOrdem() {return ordem;}
+
+    public void setOrdem(Integer ordem) {this.ordem = ordem;}
 }

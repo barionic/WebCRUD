@@ -29,6 +29,11 @@ public class HiperlinkFacade {
         associarGrupo(hiperlink, grupoId);
         associarTags(hiperlink, tagIds);
 
+        if(hiperlink.getId() == null){
+            Integer ultimaOrdem = dao.buscarMaiorOrdem();
+            hiperlink.setOrdem(ultimaOrdem == null ? 1 : ultimaOrdem + 1);
+        }
+
         if (hiperlink.getId() == null){
             dao.create(hiperlink);
         }else{
@@ -81,9 +86,11 @@ public class HiperlinkFacade {
     public Hiperlink buscarPorId(Long id){ return dao.find(id); }
 
     public List<Hiperlink> listarTodos(){
-        return dao.findAll();
+        return dao.findAllOrdenado();
     }
 
-
+    public void atualizar(Hiperlink h){
+        dao.atualizar(h);
+    }
 
 }

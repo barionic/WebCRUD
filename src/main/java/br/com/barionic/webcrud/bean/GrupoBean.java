@@ -41,8 +41,12 @@ public class GrupoBean implements Serializable {
         }
     }
 
-    public void remover(Grupo g){
-        facade.remover(g.getId());
+    public void editar(Grupo grupo){
+        this.grupo = grupo;
+    }
+
+    public void remover(Grupo grupo){
+        facade.remover(grupo.getId());
         lista = facade.listarTodos();
     }
 

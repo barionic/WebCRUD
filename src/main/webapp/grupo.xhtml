@@ -31,6 +31,7 @@
            <h:column>
                <f:facet name="header">Ações</f:facet>
                <h:commandButton value="Remover" action="#{grupoBean.remover(g)}"/>
+               <h:commandButton value="Editar" action="#{grupoBean.editar(g)}" update="form"/>
            </h:column>
        </h:dataTable>
     </h:form>

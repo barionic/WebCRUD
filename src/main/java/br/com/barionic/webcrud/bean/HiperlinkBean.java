@@ -17,6 +17,7 @@ import jakarta.inject.Named;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Named("hiperlinkBean")
 @ViewScoped
@@ -55,6 +56,14 @@ public class HiperlinkBean implements Serializable{
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
                             e.getMessage(), null));
+        }
+    }
+
+    public void editar(Hiperlink hiperlink){
+        this.hiperlink = hiperlink;
+        this.grupoId = hiperlink.getGrupo() != null ? hiperlink.getGrupo().getId() : null;
+        if (hiperlink.getTags() != null){
+            this.tagIds = hiperlink.getTags().stream().map(Tag::getId).collect(Collectors.toList());
         }
     }
 

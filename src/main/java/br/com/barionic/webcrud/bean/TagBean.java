@@ -41,6 +41,10 @@ public class TagBean implements Serializable {
         }
     }
 
+    public void editar(Tag tag){
+        this.tag = tag;
+    }
+
     public void remover(Tag t){
         facade.remover(t.getId());
         lista = facade.listarTodos();

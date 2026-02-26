@@ -32,7 +32,7 @@
                     <f:selectItems value="#{hiperlinkBean.grupos}" var="g" itemValue="#{g.id}" itemLabel="#{g.grupoName}" />
                 </h:selectOneMenu>
 
-                <h:outputLink value="grupo.xhtml" target="_blank">
+                <h:outputLink value="grupo.xhtml">
                     Gerenciar Grupo
                 </h:outputLink>
                 <br />
@@ -42,7 +42,7 @@
                     <f:selectItems value="#{hiperlinkBean.tags}" var="t" itemValue="#{t.id}" itemLabel="#{t.tagName}"/>
                 </h:selectManyCheckbox>
 
-                <h:outputLink value="tag.xhtml" target="_blank">
+                <h:outputLink value="tag.xhtml">
                     Gerenciar Tags
                 </h:outputLink>
                 <br />
@@ -87,6 +87,7 @@
                     <h:column>
                         <f:facet name="header">Ações</f:facet>
                         <h:commandButton value="Remover" action="#{hiperlinkBean.remover(h)}"/>
+                        <h:commandButton value="Editar" action="#{hiperlinkBean.editar(h)}" update="form"/>
                     </h:column>
                 </h:dataTable>
             </h:form>

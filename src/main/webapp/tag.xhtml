@@ -20,6 +20,7 @@
             </h:column>
             <h:column>
                 <h:commandButton value="Remover" action="#{tagBean.remover(t)}"/>
+                <h:commandButton value="Editar" action="#{tagBean.editar(t)}" update="form"/>
             </h:column>
         </h:dataTable>
     </h:form>

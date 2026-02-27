@@ -32,6 +32,9 @@ public class HiperlinkBean implements Serializable{
     private Long filtroTagId;
     private Cor filtroCor;
 
+    private static final Long SEM_GRUPO = -1L;
+    private Long grupoSelecionado;
+
     @Inject
     private HiperlinkFacade facade;
 
@@ -43,7 +46,6 @@ public class HiperlinkBean implements Serializable{
 
     private Hiperlink hiperlink;
     private List<Hiperlink> lista;
-    private Long grupoSelecionado;
 
     @PostConstruct
     public void init(){
@@ -84,20 +86,28 @@ public class HiperlinkBean implements Serializable{
     }
 
     public void carregarLista(){
-        if (grupoSelecionado != null){
-            lista = facade.listarPorGrupoOrdenado(grupoSelecionado);
-        } else {
+        if (grupoSelecionado == null){
             lista = facade.listarTodos();
+        }
+        else if(SEM_GRUPO.equals(grupoSelecionado)){
+            lista = facade.listarSemGrupoOrdenado();
+        }
+        else{
+            lista = facade.listarPorGrupoOrdenado(grupoSelecionado);
         }
     }
 
-    public void subir(Hiperlink hiperlink){
-        facade.subir(hiperlink.getId(), grupoSelecionado);
+    public void subir(Hiperlink atual){
+        boolean semGrupo = SEM_GRUPO.equals(grupoSelecionado);
+        Long grupoId = (!semGrupo ? grupoSelecionado : null);
+        facade.mover(atual.getId(), grupoId, semGrupo, true);
         carregarLista();
     }
 
-    public void descer(Hiperlink hiperlink){
-        facade.descer(hiperlink.getId(), grupoSelecionado);
+    public void descer(Hiperlink atual){
+        boolean semGrupo = SEM_GRUPO.equals(grupoSelecionado);
+        Long grupoId = (!semGrupo ? grupoSelecionado : null);
+        facade.mover(atual.getId(), grupoId, semGrupo, false);
         carregarLista();
     }
 

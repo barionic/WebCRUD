@@ -12,7 +12,8 @@
     <h:form>
         <h:outputLabel value="Ordenar por Grupo? "/>
         <h:selectOneMenu value="#{hiperlinkBean.grupoSelecionado}">
-            <f:selectItem itemLabel="Todos os links" itemValue="#{null}"/>
+            <f:selectItem itemLabel="Todos os Links" itemValue="#{null}"/>
+            <f:selectItem itemLabel="Links Sem Grupo" itemValue="-1"/>
             <f:selectItems value="#{grupoBean.lista}" var="g" itemLabel="#{g.grupoName}" itemValue="#{g.id}"/>
             <f:ajax listener="#{hiperlinkBean.carregarLista}" render="tabelaOrdenacao"/>
         </h:selectOneMenu>

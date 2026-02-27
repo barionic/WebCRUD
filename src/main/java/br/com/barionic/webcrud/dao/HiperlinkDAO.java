@@ -47,10 +47,36 @@ public class HiperlinkDAO extends GenericDAO<Hiperlink>{
                 .getResultList();
     }
 
+    public List<Hiperlink> findNoGrupo(){
+        return em.createQuery("SELECT h FROM Hiperlink h WHERE h.grupo IS NULL ORDER BY h.ordem", Hiperlink.class).getResultList();
+    }
+
+    public Hiperlink buscarVizinho(Long grupoId, boolean semGrupo, Integer ordemAtual, boolean anterior){
+        String operador = anterior ? "<" : ">";
+        String direcao = anterior ? "DESC" : "ASC";
+
+        StringBuilder jpql = new StringBuilder("SELECT h FROM Hiperlink h WHERE h.ordem " + operador + " :ordem");
+
+        if (semGrupo){
+            jpql.append(" AND h.grupo IS NULL");
+        }
+        else if(grupoId != null){
+            jpql.append(" AND h.grupo.id = :grupoId");
+        }
+        jpql.append(" ORDER BY h.ordem ").append(direcao);
+        var query = em.createQuery(jpql.toString(), Hiperlink.class).setParameter("ordem", ordemAtual).setMaxResults(1);
+        if (!semGrupo && grupoId != null){
+            query.setParameter("grupoId", grupoId);
+        }
+        return query.getResultStream().findFirst().orElse(null);
+    }
+
+
     public Integer buscarMaiorOrdem(){
         return em.createQuery("SELECT MAX(h.ordem) FROM Hiperlink h", Integer.class).getSingleResult();
     }
 
+    /*
     public Hiperlink buscarAnterior(Integer ordemAtual){
         return em.createQuery("SELECT h FROM Hiperlink h WHERE h.ordem < :ordem ORDER BY h.ordem DESC", Hiperlink.class)
                 .setParameter("ordem", ordemAtual)
@@ -88,6 +114,7 @@ public class HiperlinkDAO extends GenericDAO<Hiperlink>{
                 .findFirst()
                 .orElse(null);
     }
+    */
 
     public List<Hiperlink> buscarComFiltro(String nome, Long grupoId, Long tagId, Cor cor){
         StringBuilder jpql = new StringBuilder("SELECT DISTINCT h FROM Hiperlink h ");

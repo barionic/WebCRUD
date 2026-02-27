@@ -93,37 +93,27 @@ public class HiperlinkFacade {
         return dao.findByGrupoOrdenado(grupoId);
     }
 
-    public void subir(Long id, Long groupoId){
-        Hiperlink atual = dao.find(id);
-        Hiperlink anterior;
-        if(groupoId != null){
-            anterior = dao.buscarAnteriorPorGrupo(groupoId, atual.getOrdem());
-        }else{
-            anterior = dao.buscarAnterior(atual.getOrdem());
-        }
-
-        if(anterior != null){
-            Integer temp = atual.getOrdem();
-            atual.setOrdem(anterior.getOrdem());
-            anterior.setOrdem(temp);
-        }
+    public List<Hiperlink> listarSemGrupoOrdenado(){
+        return dao.findNoGrupo();
     }
 
-    public void descer(Long id, Long grupoId){
-        Hiperlink atual = dao.find(id);
-        Hiperlink proximo;
-        if (grupoId != null){
-            proximo = dao.buscarProximoPorGrupo(grupoId, atual.getOrdem());
-        }else{
-            proximo = dao.buscarProximo(atual.getOrdem());
-        }
-
-        if (proximo != null){
-            Integer temp = atual.getOrdem();
-            atual.setOrdem(proximo.getOrdem());
-            proximo.setOrdem(temp);
-        }
+    public Hiperlink buscarVizinho(Long grupoId,boolean semGrupo, Integer ordemAtual, boolean anterior){
+        return dao.buscarVizinho(grupoId, semGrupo, ordemAtual, anterior);
     }
 
+    public void mover(Long id, Long grupoId, boolean semGrupo, boolean anterior) {
+        Hiperlink atual = dao.find(id);
+        Hiperlink vizinho = dao.buscarVizinho(
+                grupoId,
+                semGrupo,
+                atual.getOrdem(),
+                anterior
+        );
+        if (vizinho != null){
+            Integer temp = atual.getOrdem();
+            atual.setOrdem(vizinho.getOrdem());
+            vizinho.setOrdem(temp);
+        }
+    }
 
 }

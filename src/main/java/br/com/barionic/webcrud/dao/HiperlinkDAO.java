@@ -71,50 +71,9 @@ public class HiperlinkDAO extends GenericDAO<Hiperlink>{
         return query.getResultStream().findFirst().orElse(null);
     }
 
-
     public Integer buscarMaiorOrdem(){
         return em.createQuery("SELECT MAX(h.ordem) FROM Hiperlink h", Integer.class).getSingleResult();
     }
-
-    /*
-    public Hiperlink buscarAnterior(Integer ordemAtual){
-        return em.createQuery("SELECT h FROM Hiperlink h WHERE h.ordem < :ordem ORDER BY h.ordem DESC", Hiperlink.class)
-                .setParameter("ordem", ordemAtual)
-                .setMaxResults(1)
-                .getResultStream()
-                .findFirst()
-                .orElse(null);
-    }
-
-    public Hiperlink buscarAnteriorPorGrupo(Long grupoId, Integer ordemAtual){
-        return em.createQuery("SELECT h FROM Hiperlink h WHERE h.grupo.id = :grupoId AND h.ordem < :ordem ORDER BY h.ordem DESC", Hiperlink.class)
-                .setParameter("grupoId", grupoId)
-                .setParameter("ordem", ordemAtual)
-                .setMaxResults(1)
-                .getResultStream()
-                .findFirst()
-                .orElse(null);
-    }
-
-    public Hiperlink buscarProximo(Integer ordemAtual){
-        return em.createQuery("SELECT h FROM Hiperlink h WHERE h.ordem > :ordem ORDER BY h.ordem ASC", Hiperlink.class)
-                .setParameter("ordem", ordemAtual)
-                .setMaxResults(1)
-                .getResultStream()
-                .findFirst()
-                .orElse(null);
-    }
-
-    public Hiperlink buscarProximoPorGrupo(Long grupoId, Integer ordemAtual){
-        return em.createQuery("SELECT h FROM Hiperlink h WHERE h.grupo.id = :grupoId AND h.ordem > :ordem ORDER BY h.ordem ASC", Hiperlink.class)
-                .setParameter("grupoId", grupoId)
-                .setParameter("ordem", ordemAtual)
-                .setMaxResults(1)
-                .getResultStream()
-                .findFirst()
-                .orElse(null);
-    }
-    */
 
     public List<Hiperlink> buscarComFiltro(String nome, Long grupoId, Long tagId, Cor cor){
         StringBuilder jpql = new StringBuilder("SELECT DISTINCT h FROM Hiperlink h ");
@@ -126,10 +85,18 @@ public class HiperlinkDAO extends GenericDAO<Hiperlink>{
             jpql.append("AND LOWER(h.name) LIKE LOWER(:nome) ");
         }
         if (grupoId != null){
-            jpql.append("AND h.grupo.id = :grupoId ");
+            if(grupoId.equals(-1L)){
+                jpql.append("AND h.grupo IS NULL ");
+            }else {
+                jpql.append("AND h.grupo.id = :grupoId ");
+            }
         }
         if (tagId != null){
-            jpql.append("AND t.id = :tagId ");
+            if(tagId.equals(-1L)){
+                jpql.append("AND h.tags IS EMPTY ");
+            }else {
+                jpql.append("AND t.id = :tagId ");
+            }
         }
         if (cor != null){
             jpql.append("AND h.color = :cor ");
@@ -138,10 +105,10 @@ public class HiperlinkDAO extends GenericDAO<Hiperlink>{
         if (nome != null && !nome.isBlank()){
             query.setParameter("nome", "%" + nome + "%");
         }
-        if(grupoId != null){
+        if(grupoId != null && !grupoId.equals(-1L)){
             query.setParameter("grupoId", grupoId);
         }
-        if(tagId != null){
+        if(tagId != null && !tagId.equals(-1L)){
             query.setParameter("tagId", tagId);
         }
         if(cor != null){

@@ -33,6 +33,7 @@ public class HiperlinkBean implements Serializable{
     private Cor filtroCor;
 
     private static final Long SEM_GRUPO = -1L;
+    private static final Long SEM_TAG = -1L;
     private Long grupoSelecionado;
 
     @Inject

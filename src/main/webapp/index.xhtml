@@ -59,10 +59,12 @@
                 <h:inputText value="#{hiperlinkBean.filtroNome}" placeholder="Buscar por nome"/>
                 <h:selectOneMenu value="#{hiperlinkBean.filtroGrupoId}">
                     <f:selectItem itemLabel="Todos Grupos" itemValue="#{null}"/>
+                    <f:selectItem itemLabel="Todos SEM Grupo" itemValue="-1"/>
                     <f:selectItems value="#{hiperlinkBean.grupos}" var="g" itemValue="#{g.id}" itemLabel="#{g.grupoName}"/>
                 </h:selectOneMenu>
                 <h:selectOneMenu value="#{hiperlinkBean.filtroTagId}">
                     <f:selectItem itemLabel="Todas Tags" itemValue="#{null}"/>
+                    <f:selectItem itemLabel="Todos SEM Tags" itemValue="-1"/>
                     <f:selectItems value="#{hiperlinkBean.tags}" var="t" itemValue="#{t.id}" itemLabel="#{t.tagName}"/>
                 </h:selectOneMenu>
                 <h:selectOneMenu value="#{hiperlinkBean.filtroCor}">

@@ -89,8 +89,27 @@ public class HiperlinkFacade {
         return dao.findAllOrdenado();
     }
 
-    public void atualizar(Hiperlink h){
-        dao.atualizar(h);
+    public void subir(Long id){
+        Hiperlink atual = dao.find(id);
+        Hiperlink anterior = dao.buscarAnterior(atual.getOrdem());
+
+        if(anterior != null){
+            Integer temp = atual.getOrdem();
+            atual.setOrdem(anterior.getOrdem());
+            anterior.setOrdem(temp);
+        }
     }
+
+    public void descer(Long id){
+        Hiperlink atual = dao.find(id);
+        Hiperlink proximo = dao.buscarProximo(atual.getOrdem());
+
+        if (proximo != null){
+            Integer temp = atual.getOrdem();
+            atual.setOrdem(proximo.getOrdem());
+            proximo.setOrdem(temp);
+        }
+    }
+
 
 }

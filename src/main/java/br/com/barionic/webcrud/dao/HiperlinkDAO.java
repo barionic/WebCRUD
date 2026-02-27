@@ -45,8 +45,21 @@ public class HiperlinkDAO extends GenericDAO<Hiperlink>{
         return em.createQuery("SELECT MAX(h.ordem) FROM Hiperlink h", Integer.class).getSingleResult();
     }
 
-    public void atualizar(Hiperlink h){
-        em.merge(h);
+    public Hiperlink buscarAnterior(Integer ordemAtual){
+        return em.createQuery("SELECT h FROM Hiperlink h WHERE h.ordem < :ordem ORDER BY h.ordem DESC", Hiperlink.class)
+                .setParameter("ordem", ordemAtual)
+                .setMaxResults(1)
+                .getResultStream()
+                .findFirst()
+                .orElse(null);
+    }
+    public Hiperlink buscarProximo(Integer ordemAtual){
+        return em.createQuery("SELECT h FROM Hiperlink h WHERE h.ordem > :ordem ORDER BY h.ordem ASC", Hiperlink.class)
+                .setParameter("ordem", ordemAtual)
+                .setMaxResults(1)
+                .getResultStream()
+                .findFirst()
+                .orElse(null);
     }
 
     public List<Hiperlink> buscarComFiltro(String nome, Long grupoId, Long tagId, Cor cor){

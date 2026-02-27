@@ -89,9 +89,18 @@ public class HiperlinkFacade {
         return dao.findAllOrdenado();
     }
 
-    public void subir(Long id){
+    public List<Hiperlink> listarPorGrupoOrdenado(Long grupoId){
+        return dao.findByGrupoOrdenado(grupoId);
+    }
+
+    public void subir(Long id, Long groupoId){
         Hiperlink atual = dao.find(id);
-        Hiperlink anterior = dao.buscarAnterior(atual.getOrdem());
+        Hiperlink anterior;
+        if(groupoId != null){
+            anterior = dao.buscarAnteriorPorGrupo(groupoId, atual.getOrdem());
+        }else{
+            anterior = dao.buscarAnterior(atual.getOrdem());
+        }
 
         if(anterior != null){
             Integer temp = atual.getOrdem();
@@ -100,9 +109,14 @@ public class HiperlinkFacade {
         }
     }
 
-    public void descer(Long id){
+    public void descer(Long id, Long grupoId){
         Hiperlink atual = dao.find(id);
-        Hiperlink proximo = dao.buscarProximo(atual.getOrdem());
+        Hiperlink proximo;
+        if (grupoId != null){
+            proximo = dao.buscarProximoPorGrupo(grupoId, atual.getOrdem());
+        }else{
+            proximo = dao.buscarProximo(atual.getOrdem());
+        }
 
         if (proximo != null){
             Integer temp = atual.getOrdem();

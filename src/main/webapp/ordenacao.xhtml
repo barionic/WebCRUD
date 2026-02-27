@@ -10,14 +10,22 @@
 <h:body>
     <h2>Criar Ordem entre Links</h2>
     <h:form>
-        <h:dataTable value="#{hiperlinkBean.lista}" var="h">
+        <h:outputLabel value="Ordenar por Grupo? "/>
+        <h:selectOneMenu value="#{hiperlinkBean.grupoSelecionado}">
+            <f:selectItem itemLabel="Todos os links" itemValue="#{null}"/>
+            <f:selectItems value="#{grupoBean.lista}" var="g" itemLabel="#{g.grupoName}" itemValue="#{g.id}"/>
+            <f:ajax listener="#{hiperlinkBean.carregarLista}" render="tabelaOrdenacao"/>
+        </h:selectOneMenu>
+        <br />
+        <br />
+        <h:dataTable id="tabelaOrdenacao" value="#{hiperlinkBean.lista}" var="h">
             <h:column>
                 <h:commandButton value="↑" action="#{hiperlinkBean.subir(h)}"/>
                 <h:commandButton value="↓" action="#{hiperlinkBean.descer(h)}"/>
             </h:column>
-            <h:column>
+            <!-- <h:column>
                 #{h.ordem}
-            </h:column>
+            </h:column> -->
             <h:column>
                 #{h.name}
             </h:column>

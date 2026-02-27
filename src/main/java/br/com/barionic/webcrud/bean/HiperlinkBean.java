@@ -43,6 +43,7 @@ public class HiperlinkBean implements Serializable{
 
     private Hiperlink hiperlink;
     private List<Hiperlink> lista;
+    private Long grupoSelecionado;
 
     @PostConstruct
     public void init(){
@@ -50,6 +51,7 @@ public class HiperlinkBean implements Serializable{
         lista = facade.listarTodos();
         grupos = grupoFacade.listarTodos();
         tags = tagFacade.listarTodos();
+        carregarLista();
     }
 
     public void salvar(){
@@ -81,14 +83,22 @@ public class HiperlinkBean implements Serializable{
         lista = facade.buscarComFiltro(filtroNome, filtroGrupoId, filtroTagId, filtroCor);
     }
 
+    public void carregarLista(){
+        if (grupoSelecionado != null){
+            lista = facade.listarPorGrupoOrdenado(grupoSelecionado);
+        } else {
+            lista = facade.listarTodos();
+        }
+    }
+
     public void subir(Hiperlink hiperlink){
-        facade.subir(hiperlink.getId());
-        lista = facade.listarTodos();
+        facade.subir(hiperlink.getId(), grupoSelecionado);
+        carregarLista();
     }
 
     public void descer(Hiperlink hiperlink){
-        facade.descer(hiperlink.getId());
-        lista = facade.listarTodos();
+        facade.descer(hiperlink.getId(), grupoSelecionado);
+        carregarLista();
     }
 
     // ==== Getters & Setters ====
@@ -126,4 +136,8 @@ public class HiperlinkBean implements Serializable{
     public void setFiltroTagId(Long filtroTagId) {this.filtroTagId = filtroTagId;}
 
     public void setFiltroGrupoId(Long filtroGrupoId) {this.filtroGrupoId = filtroGrupoId;}
+
+    public Long getGrupoSelecionado() {return grupoSelecionado;}
+
+    public void setGrupoSelecionado(Long grupoSelecionado) {this.grupoSelecionado = grupoSelecionado;}
 }

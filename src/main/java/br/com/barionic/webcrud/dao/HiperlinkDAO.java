@@ -41,6 +41,12 @@ public class HiperlinkDAO extends GenericDAO<Hiperlink>{
         return em.createQuery("SELECT h FROM Hiperlink h ORDER BY h.ordem ASC", Hiperlink.class).getResultList();
     }
 
+    public List<Hiperlink> findByGrupoOrdenado(Long grupoId){
+        return em.createQuery("SELECT h FROM Hiperlink h WHERE h.grupo.id = :grupoId ORDER BY h.ordem", Hiperlink.class)
+                .setParameter("grupoId", grupoId)
+                .getResultList();
+    }
+
     public Integer buscarMaiorOrdem(){
         return em.createQuery("SELECT MAX(h.ordem) FROM Hiperlink h", Integer.class).getSingleResult();
     }
@@ -53,8 +59,29 @@ public class HiperlinkDAO extends GenericDAO<Hiperlink>{
                 .findFirst()
                 .orElse(null);
     }
+
+    public Hiperlink buscarAnteriorPorGrupo(Long grupoId, Integer ordemAtual){
+        return em.createQuery("SELECT h FROM Hiperlink h WHERE h.grupo.id = :grupoId AND h.ordem < :ordem ORDER BY h.ordem DESC", Hiperlink.class)
+                .setParameter("grupoId", grupoId)
+                .setParameter("ordem", ordemAtual)
+                .setMaxResults(1)
+                .getResultStream()
+                .findFirst()
+                .orElse(null);
+    }
+
     public Hiperlink buscarProximo(Integer ordemAtual){
         return em.createQuery("SELECT h FROM Hiperlink h WHERE h.ordem > :ordem ORDER BY h.ordem ASC", Hiperlink.class)
+                .setParameter("ordem", ordemAtual)
+                .setMaxResults(1)
+                .getResultStream()
+                .findFirst()
+                .orElse(null);
+    }
+
+    public Hiperlink buscarProximoPorGrupo(Long grupoId, Integer ordemAtual){
+        return em.createQuery("SELECT h FROM Hiperlink h WHERE h.grupo.id = :grupoId AND h.ordem > :ordem ORDER BY h.ordem ASC", Hiperlink.class)
+                .setParameter("grupoId", grupoId)
                 .setParameter("ordem", ordemAtual)
                 .setMaxResults(1)
                 .getResultStream()

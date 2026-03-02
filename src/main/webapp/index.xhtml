@@ -4,126 +4,141 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
 
-    <h:head>
-        <title>WebCRUD</title>
-    </h:head>
-    <h:body>
+<h:head>
+    <title>WebCRUD</title>
+</h:head>
+<h:body>
+    <h:form id="formCadastro">
         <h2>Adicionar Hiperlink</h2>
-        <h:form id="formAdd">
-            <h:panelGrid columns="2">
-                <h:outputLabel value="Nome: "/>
-                <h:inputText value="#{hiperlinkBean.hiperlink.name}" required="true"/>
+        <h:panelGrid columns="2">
+            <h:outputLabel value="Nome: "/>
+            <h:inputText value="#{hiperlinkBean.hiperlink.name}" required="true"/>
 
-                <h:outputLabel value="URL: "/>
-                <h:inputText value="#{hiperlinkBean.hiperlink.url}" required="true"/>
+            <h:outputLabel value="URL: "/>
+            <h:inputText value="#{hiperlinkBean.hiperlink.url}" required="true"/>
 
-                <h:outputLabel value="Suas Notas: "/>
-                <h:inputTextarea value="#{hiperlinkBean.hiperlink.notes}" rows="4" cols="40"/>
+            <h:outputLabel value="Suas Notas: "/>
+            <h:inputTextarea value="#{hiperlinkBean.hiperlink.notes}" rows="4" cols="40"/>
 
-                <h:outputLabel value="Cor: "/>
-                <h:selectOneMenu value="#{hiperlinkBean.hiperlink.color}">
-                    <f:selectItem itemValue="" itemLabel="---Default: Sem Cor---"/>
-                    <f:selectItems value="#{hiperlinkBean.colors}" var="c" itemValue="#{c}" itemLabel="#{c}"/>
-                </h:selectOneMenu>
+            <h:outputLabel value="Cor: "/>
+            <h:selectOneMenu value="#{hiperlinkBean.hiperlink.color}">
+                <f:selectItem itemValue="" itemLabel="---Default: Sem Cor---"/>
+                <f:selectItems value="#{hiperlinkBean.colors}" var="c" itemValue="#{c}" itemLabel="#{c}"/>
+            </h:selectOneMenu>
 
-                <h:outputLabel value="Grupo: "/>
-                <h:selectOneMenu value="#{hiperlinkBean.grupoId}">
-                    <f:selectItem itemLabel="---Escolha---" itemValue="#{null}"/>
-                    <f:selectItems value="#{hiperlinkBean.grupos}" var="g" itemValue="#{g.id}" itemLabel="#{g.grupoName}" />
-                </h:selectOneMenu>
+            <h:outputLabel value="Grupo: "/>
+            <h:selectOneMenu value="#{hiperlinkBean.grupoId}">
+                <f:selectItem itemLabel="---Escolha---" itemValue="#{null}"/>
+                <f:selectItems value="#{hiperlinkBean.grupos}" var="g" itemValue="#{g.id}" itemLabel="#{g.grupoName}"/>
+            </h:selectOneMenu>
 
-                <h:outputLink value="grupo.xhtml">
-                    Gerenciar Grupo
-                </h:outputLink>
-                <br />
+            <h:outputLink value="grupo.xhtml">
+                Gerenciar Grupo
+            </h:outputLink>
+            <br/>
 
-                <h:outputLabel value="Tags:"/>
-                <h:selectManyCheckbox value="#{hiperlinkBean.tagIds}">
-                    <f:selectItems value="#{hiperlinkBean.tags}" var="t" itemValue="#{t.id}" itemLabel="#{t.tagName}"/>
-                </h:selectManyCheckbox>
+            <h:outputLabel value="Tags:"/>
+            <h:selectManyCheckbox value="#{hiperlinkBean.tagIds}">
+                <f:selectItems value="#{hiperlinkBean.tags}" var="t" itemValue="#{t.id}" itemLabel="#{t.tagName}"/>
+            </h:selectManyCheckbox>
 
-                <h:outputLink value="tag.xhtml">
-                    Gerenciar Tags
-                </h:outputLink>
-                <br />
+            <h:outputLink value="tag.xhtml">
+                Gerenciar Tags
+            </h:outputLink>
+            <br/>
 
-            </h:panelGrid>
-            <br />
-            <h:commandButton value="Salvar"
-                             action="#{hiperlinkBean.salvar()}" />
+        </h:panelGrid>
+        <br/>
+        <h:commandButton value="Salvar"
+                         action="#{hiperlinkBean.salvar()}"/>
         </h:form>
-        <hr />
+        <hr/>
+        <h:form id="formFiltros">
         <h2>Lista de Hiperlinks</h2>
-        <h:panelGrid columns="5" style="margin-bottom: 10px">
-            <h:form id="formBuscaFiltro">
-                <h:inputText value="#{hiperlinkBean.filtroNome}" placeholder="Buscar por nome"/>
-                <h:selectOneMenu value="#{hiperlinkBean.filtroGrupoId}">
-                    <f:selectItem itemLabel="Todos Grupos" itemValue="#{null}"/>
-                    <f:selectItem itemLabel="Todos SEM Grupo" itemValue="-1"/>
-                    <f:selectItems value="#{hiperlinkBean.grupos}" var="g" itemValue="#{g.id}" itemLabel="#{g.grupoName}"/>
-                </h:selectOneMenu>
-                <h:selectOneMenu value="#{hiperlinkBean.filtroTagId}">
-                    <f:selectItem itemLabel="Todas Tags" itemValue="#{null}"/>
-                    <f:selectItem itemLabel="Todos SEM Tags" itemValue="-1"/>
-                    <f:selectItems value="#{hiperlinkBean.tags}" var="t" itemValue="#{t.id}" itemLabel="#{t.tagName}"/>
-                </h:selectOneMenu>
-                <h:selectOneMenu value="#{hiperlinkBean.filtroCor}">
-                    <f:selectItem itemLabel="Todas Cores" itemValue="#{null}"/>
-                    <f:selectItems value="#{hiperlinkBean.colors}" var="c" itemValue="#{c}" itemLabel="#{c}"/>
-                </h:selectOneMenu>
-                <h:commandButton value="Buscar" action="#{hiperlinkBean.buscar}"/>
-            </h:form>
+        <h:panelGrid layout="block" style="margin-bottom: 15px">
+            <h:inputText value="#{hiperlinkBean.filtroNome}" placeholder="Buscar por nome"/>
+            <h:selectOneMenu value="#{hiperlinkBean.filtroGrupoId}">
+                <f:selectItem itemLabel="Todos Grupos" itemValue="#{null}"/>
+                <f:selectItem itemLabel="Todos SEM Grupo" itemValue="-1"/>
+                <f:selectItems value="#{hiperlinkBean.grupos}" var="g" itemValue="#{g.id}" itemLabel="#{g.grupoName}"/>
+            </h:selectOneMenu>
+            <h:selectOneMenu value="#{hiperlinkBean.filtroTagId}">
+                <f:selectItem itemLabel="Todas Tags" itemValue="#{null}"/>
+                <f:selectItem itemLabel="Todos SEM Tags" itemValue="-1"/>
+                <f:selectItems value="#{hiperlinkBean.tags}" var="t" itemValue="#{t.id}" itemLabel="#{t.tagName}"/>
+            </h:selectOneMenu>
+            <h:selectOneMenu value="#{hiperlinkBean.filtroCor}">
+                <f:selectItem itemLabel="Todas Cores" itemValue="#{null}"/>
+                <f:selectItems value="#{hiperlinkBean.colors}" var="c" itemValue="#{c}" itemLabel="#{c}"/>
+            </h:selectOneMenu>
+            <h:commandButton value="Buscar" action="#{hiperlinkBean.buscar}">
+                <f:ajax render=":formTabela"/>
+            </h:commandButton>
+            <br/>
+            <br/>
+            <h:outputText value="Mostrar Logs?"/>
+            <h:selectBooleanCheckbox value="#{hiperlinkBean.mostrarLog}">
+                <f:ajax execute="@this" render=":formTabela"/>
+            </h:selectBooleanCheckbox>
+
         </h:panelGrid>
-        <br />
+        <br/>
         <h:link outcome="ordenacao.xhtml" value="Ordenar Lista de Links"/>
-        <br />
-        <br />
-        <br />
-        <h:panelGrid id="lista">
+        </h:form>
+        <br/>
+        <br/>
+        <br/>
+<!--        <h:panelGrid id="lista">-->
             <h:form id="formTabela">
+            <h:dataTable id="tabelaResultados" value="#{hiperlinkBean.lista}" var="h" border="1">
+                <h:column>
+                    <f:facet name="header">Nome</f:facet>
+                    <h:outputLink value="#{h.url}" target="_blank">
+                        <h:outputText value="#{h.name}"/>
+                    </h:outputLink>
+                </h:column>
 
-                <h:dataTable id="tabelaResultados" value="#{hiperlinkBean.lista}" var="h" border="1">
-                    <!-- <h:column>
-                        <f:facet name="header">Ordem</f:facet>
-                        <h:inputText value="{h.ordem}" style="width:50px">
-                            <f:ajax event="blur" listener="#{hiperlinkBean.atualizarOrdem(h)}" render="tabelaResultados"/>
-                        </h:inputText>
-                    </h:column> -->
-                    <h:column>
-                        <f:facet name="header">Nome</f:facet>
-                        <h:outputLink value="#{h.url}" target="_blank">
-                            <h:outputText value="#{h.name}"/>
-                        </h:outputLink>
-                    </h:column>
+                <h:column>
+                    <f:facet name="header">Notas</f:facet>
+                    #{h.notes}
+                </h:column>
 
-                    <h:column>
-                        <f:facet name="header">Notas</f:facet>
-                        #{h.notes}
-                    </h:column>
+                <h:column>
+                    <f:facet name="header">Grupo</f:facet>
+                    #{h.grupo != null ? h.grupo.grupoName : '-'}
+                </h:column>
 
-                    <h:column>
-                        <f:facet name="header">Grupo</f:facet>
-                        #{h.grupo != null ? h.grupo.grupoName : '-'}
-                    </h:column>
+                <h:column>
+                    <f:facet name="header">Tags</f:facet>
+                    <!--#{h.tags.stream().map(t -> t.tagName).toList()}-->
+                    #{h.tagsFormatadas}
+                </h:column>
 
-                    <h:column>
-                        <f:facet name="header">Tags</f:facet>
-                        #{h.tags.stream().map(t -> t.tagName).toList()}
-                    </h:column>
+                <h:column>
+                    <f:facet name="header">Cor</f:facet>
+                    #{h.color}
+                </h:column>
 
-                    <h:column>
-                        <f:facet name="header">Cor</f:facet>
-                        #{h.color}
-                    </h:column>
+                <h:column rendered="#{hiperlinkBean.mostrarLog}">
+                    <f:facet name="header">Horario-Alterações</f:facet>
+                        Criado:
+                        <h:outputText value="#{h.dataCriacaoFormatada}"/>
+                        <br/>
+                        Editado:
+                        <h:outputText value="#{h.dataAtualizacaoFormatada}"/>
+                </h:column>
 
-                    <h:column>
-                        <f:facet name="header">Ações</f:facet>
-                        <h:commandButton value="Remover" action="#{hiperlinkBean.remover(h)}"/>
-                        <h:commandButton value="Editar" action="#{hiperlinkBean.editar(h)}" update="form"/>
-                    </h:column>
-                </h:dataTable>
-            </h:form>
-        </h:panelGrid>
-    </h:body>
+                <h:column>
+                    <f:facet name="header">Ações</f:facet>
+                    <h:commandButton value="Remover" action="#{hiperlinkBean.remover(h)}" immediate="true">
+                        <f:ajax render="formTabela"/>
+                    </h:commandButton>
+                    <h:commandButton value="Editar" action="#{hiperlinkBean.editar(h)}">
+                        <f:ajax render=":formCadastro"/>
+                    </h:commandButton>
+                </h:column>
+            </h:dataTable>
+    </h:form>
+</h:body>
 </html>
 

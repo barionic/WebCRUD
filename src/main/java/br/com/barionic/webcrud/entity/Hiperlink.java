@@ -2,7 +2,10 @@ package br.com.barionic.webcrud.entity;
 
 import jakarta.persistence.*;
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name= "hiperlinks")
@@ -40,6 +43,35 @@ public class Hiperlink implements Serializable{
             inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
     private List<Tag> tags;
+
+    @Column(name = "data_criacao", nullable=false)
+    private LocalDateTime dataCriacao;
+
+    @PrePersist
+    public void prePersist(){
+        this.dataCriacao = LocalDateTime.now();
+    }
+
+    @Column(name = "data_atualizacao")
+    private LocalDateTime dataAtualizacao;
+
+    @PreUpdate
+    public void preUpdate(){
+        this.dataAtualizacao = LocalDateTime.now();
+    }
+
+    public String getDataCriacaoFormatada(){
+        return dataCriacao != null ? dataCriacao.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) : "";
+    }
+
+    public String getDataAtualizacaoFormatada(){
+        return dataAtualizacao != null ? dataAtualizacao.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) : "";
+    }
+
+    public String getTagsFormatadas(){
+        if (tags == null || tags.isEmpty()) return "-";
+        return tags.stream().map(Tag::getTagName).collect(Collectors.joining(", "));
+    }
 
     // ==== Getters & Setters ====
     public Long getId() {
@@ -97,4 +129,12 @@ public class Hiperlink implements Serializable{
     public Integer getOrdem() {return ordem;}
 
     public void setOrdem(Integer ordem) {this.ordem = ordem;}
+
+    public LocalDateTime getDataCriacao() {return dataCriacao;}
+
+    public void setDataCriacao(LocalDateTime dataCriacao) {this.dataCriacao = dataCriacao;}
+
+    public LocalDateTime getDataAtualizacao() {return dataAtualizacao;}
+
+    public void setDataAtualizacao(LocalDateTime dataAtualizacao) {this.dataAtualizacao = dataAtualizacao;}
 }

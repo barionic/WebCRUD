@@ -35,6 +35,7 @@ public class HiperlinkBean implements Serializable{
     private static final Long SEM_GRUPO = -1L;
     private static final Long SEM_TAG = -1L;
     private Long grupoSelecionado;
+    private boolean mostrarLog = false;
 
     @Inject
     private HiperlinkFacade facade;
@@ -130,6 +131,10 @@ public class HiperlinkBean implements Serializable{
     public void setTagIds(List<Long> tagIds) {this.tagIds = tagIds;}
 
     public Cor[] getColors(){return Cor.values();}
+
+    public boolean isMostrarLog() {return mostrarLog;}
+
+    public void setMostrarLog(boolean mostrarLog) { System.out.println("Checkbox mudou para: " + mostrarLog); this.mostrarLog = mostrarLog;}
 
 
     public String getFiltroNome() {return filtroNome;}

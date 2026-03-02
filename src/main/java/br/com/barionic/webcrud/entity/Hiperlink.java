@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -137,4 +138,9 @@ public class Hiperlink implements Serializable{
     public LocalDateTime getDataAtualizacao() {return dataAtualizacao;}
 
     public void setDataAtualizacao(LocalDateTime dataAtualizacao) {this.dataAtualizacao = dataAtualizacao;}
+
+    public List<String> getNotasEmTopicos() {
+        if (notes == null || notes.isBlank()) return List.of();
+        return Arrays.asList(notes.split("\\r?\\n"));
+    }
 }

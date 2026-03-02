@@ -88,7 +88,6 @@
         <br/>
         <br/>
         <br/>
-<!--        <h:panelGrid id="lista">-->
             <h:form id="formTabela">
             <h:dataTable id="tabelaResultados" value="#{hiperlinkBean.lista}" var="h" border="1">
                 <h:column>
@@ -100,7 +99,10 @@
 
                 <h:column>
                     <f:facet name="header">Notas</f:facet>
-                    #{h.notes}
+                    <!-- #{h.notes} -->
+                    <ui:repeat value="#{h.notasEmTopicos}" var="nota">
+                        • #{nota} <br/>
+                    </ui:repeat>
                 </h:column>
 
                 <h:column>

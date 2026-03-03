@@ -1,0 +1,72 @@
+body{
+    background-color: #0d0f0d;
+    color: #33ff33;
+    font-family: "Courier New", monospace;
+}
+
+.app-header{
+    text-align: center;
+    padding: 20px;
+    font-size: 28px;
+    border-bottom: 1px solid #33ff33;
+    text-shadow: 0 0 5px #33ff33;
+}
+
+.main-card{
+    margin: 20px;
+    background: #111311 !important;
+    border: 1px solid #33ff33 !important;
+}
+
+.input-full{
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.save-button{
+    background: #33ff33 !important;
+    color: black !important;
+    border: none !important;
+}
+
+.link-card{
+    margin-bottom: 15px;
+}
+
+.link-title{
+    font-size: 18px;
+    font-weight: bold;
+    color: #10b981;
+    text-decoration: none;
+}
+
+.link-title:hover{
+    text-decoration: underline;
+}
+
+.link-group{
+    margin-top: 5px;
+    font-size: 13px;
+    color: #9ca3af;
+}
+
+.link-tags{
+    margin-top: 8px;
+}
+
+.tag-badge{
+    display: inline-block;
+    background-color: #1f2937;
+    color: #10b981;
+    padding: 3px 8px;
+    margin: 2px;
+    border-radius: 12px;
+    font-size: 12px;
+    border: 1px solid #10b981;
+}
+
+.form-grid{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}

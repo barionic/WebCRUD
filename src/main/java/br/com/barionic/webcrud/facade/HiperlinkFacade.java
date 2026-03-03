@@ -62,6 +62,8 @@ public class HiperlinkFacade {
         if (grupoId != null){
             var grupo = grupoDAO.find(grupoId);
             hiperlink.setGrupo(grupo);
+        } else {
+            hiperlink.setGrupo(null);
         }
     }
 
@@ -69,6 +71,8 @@ public class HiperlinkFacade {
         if (tagIds != null && !tagIds.isEmpty()){
             var tags = tagDAO.buscarPorIds(tagIds);
             hiperlink.setTags(tags);
+        } else {
+            hiperlink.setTags(null);
         }
     }
 

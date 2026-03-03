@@ -13,7 +13,7 @@
         <class>br.com.barionic.webcrud.entity.Tag</class>
         <properties>
             <property name="jakarta.persistence.schema-generation.database.action"
-                      value="create-or-extend-tables"/> <!-- "create-or-extend-tables" --> <!-- drop-and-create -->
+                      value="create-or-extend-tables"/> <!-- drop-and-create -->
         </properties>
     </persistence-unit>
 </persistence>

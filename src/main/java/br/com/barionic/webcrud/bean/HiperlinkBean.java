@@ -36,6 +36,7 @@ public class HiperlinkBean implements Serializable{
     private static final Long SEM_TAG = -1L;
     private Long grupoSelecionado;
     private boolean mostrarLog = false;
+    private boolean modoEdicao = false;
 
     @Inject
     private HiperlinkFacade facade;
@@ -61,8 +62,13 @@ public class HiperlinkBean implements Serializable{
     public void salvar(){
         try{
             facade.salvar(hiperlink, grupoId, tagIds);
-            hiperlink = new Hiperlink();
-            lista = facade.listarTodos();
+            String msg = modoEdicao ? "Link Editado com Sucesso!" : "Link Salvo com Sucesso!";
+
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, msg, null));
+
+            cancelarEdicao();//Limpar Registros
+            carregarLista();
         } catch (RegraNegocioException e){
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -76,11 +82,22 @@ public class HiperlinkBean implements Serializable{
         if (hiperlink.getTags() != null){
             this.tagIds = hiperlink.getTags().stream().map(Tag::getId).collect(Collectors.toList());
         }
+        modoEdicao = true;
     }
 
     public void remover(Hiperlink h){
         facade.remover(h.getId());
         lista = facade.listarTodos();
+        FacesContext.getCurrentInstance().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                        "Link removido com sucesso!", null));
+    }
+
+    public void cancelarEdicao(){
+        hiperlink = new Hiperlink();
+        grupoId = null;
+        tagIds = null;
+        modoEdicao = false;
     }
 
     public void buscar(){
@@ -99,6 +116,14 @@ public class HiperlinkBean implements Serializable{
         }
     }
 
+    public void limparFiltro(){
+        filtroNome = null;
+        filtroCor = null;
+        filtroGrupoId = null;
+        filtroTagId = null;
+        carregarLista();
+    }
+
     public void subir(Hiperlink atual){
         boolean semGrupo = SEM_GRUPO.equals(grupoSelecionado);
         Long grupoId = (!semGrupo ? grupoSelecionado : null);
@@ -115,6 +140,8 @@ public class HiperlinkBean implements Serializable{
 
     // ==== Getters & Setters ====
     public Hiperlink getHiperlink() {return hiperlink;}
+
+    public void setHiperlink(Hiperlink hiperlink) {this.hiperlink = hiperlink;}
 
     public List<Hiperlink> getLista() {return lista;}
 
@@ -156,4 +183,9 @@ public class HiperlinkBean implements Serializable{
     public Long getGrupoSelecionado() {return grupoSelecionado;}
 
     public void setGrupoSelecionado(Long grupoSelecionado) {this.grupoSelecionado = grupoSelecionado;}
+
+
+    public boolean isModoEdicao() {return modoEdicao;}
+
+    public void setModoEdicao(boolean modoEdicao) {this.modoEdicao = modoEdicao;}
 }

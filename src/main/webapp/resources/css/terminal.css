@@ -70,3 +70,9 @@ body{
     flex-direction: column;
     gap: 10px;
 }
+
+.link-dates{
+    font-size: 0.8rem;
+    color: #777;
+    margin-top: 6px;
+}

@@ -9,6 +9,7 @@ import br.com.barionic.webcrud.exception.RegraNegocioException;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Stateless
@@ -32,6 +33,8 @@ public class HiperlinkFacade {
         if(hiperlink.getId() == null){
             Integer ultimaOrdem = dao.buscarMaiorOrdem();
             hiperlink.setOrdem(ultimaOrdem == null ? 1 : ultimaOrdem + 1);
+        } else{
+            hiperlink.setDataAtualizacao(LocalDateTime.now());
         }
 
         if (hiperlink.getId() == null){

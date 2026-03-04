@@ -82,6 +82,10 @@
                         <p:commandButton value="Limpar" action="#{hiperlinkBean.limparFiltro}" update="formLista @form" process="@this" styleClass="edit-button"/>
                     </div>
                     <div>
+                        <h:outputText value="Mostar data/hora?"/>
+                        <p:inputSwitch value="#{hiperlinkBean.mostrarLog}">
+                            <p:ajax update=":formLista:dataViewLinks"/>
+                        </p:inputSwitch>
                         <p:button value="Ordenar Links" outcome="ordenacao" styleClass="save-button"/>
                     </div>
                 </div>
@@ -101,6 +105,22 @@
                         <h:outputText value="#{link.grupo.grupoName}" rendered="#{not empty link.grupo}"/>
                         <h:outputText value="Sem Grupo" rendered="#{empty link.grupo}" style="color:gray"/>
                     </div>
+
+                    <!-- Datas -->
+                    <h:panelGroup rendered="#{hiperlinkBean.mostrarLog}">
+                        <div class="link-dates">
+                            <div style="font-size: 0.85rem; color: gray; margin-top: 8px;">
+                                <h:outputText value="Created: " style="font-weight: bold;"/>
+                                <h:outputText value="#{link.dataCriacaoFormatada}" />
+                            </div>
+
+                            <div style="font-size: 0.85rem; color: gray;">
+                                <h:outputText value="Updated: " style="font-weight: bold;"/>
+                                <h:outputText value="#{link.dataAtualizacaoFormatada}" rendered="#{not empty link.dataAtualizacao and link.dataAtualizacao ne link.dataCriacao}"/>
+                                <h:outputText value="-" rendered="#{empty link.dataAtualizacao}"/>
+                            </div>
+                        </div>
+                    </h:panelGroup>
 
                     <!-- Tags -->
                     <div class="link-tags">

@@ -17,6 +17,7 @@ import jakarta.inject.Named;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Named("hiperlinkBean")
@@ -37,6 +38,7 @@ public class HiperlinkBean implements Serializable{
     private Long grupoSelecionado;
     private boolean mostrarLog = false;
     private boolean modoEdicao = false;
+    private List<Long> listaIds;
 
     @Inject
     private HiperlinkFacade facade;
@@ -102,6 +104,22 @@ public class HiperlinkBean implements Serializable{
 
     public void buscar(){
         lista = facade.buscarComFiltro(filtroNome, filtroGrupoId, filtroTagId, filtroCor);
+        /*
+        if (filtroNome != null && filtroNome.length() == 1) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Type at least 2 characters to search by name.", null));
+
+        }
+        */
+    }
+
+    public void limparFiltro(){
+        filtroNome = null;
+        filtroCor = null;
+        filtroGrupoId = null;
+        filtroTagId = null;
+        carregarLista();
     }
 
     public void carregarLista(){
@@ -114,17 +132,10 @@ public class HiperlinkBean implements Serializable{
         else{
             lista = facade.listarPorGrupoOrdenado(grupoSelecionado);
         }
+        listaIds = lista.stream().map(Hiperlink::getId).collect(Collectors.toList());
     }
 
-    public void limparFiltro(){
-        filtroNome = null;
-        filtroCor = null;
-        filtroGrupoId = null;
-        filtroTagId = null;
-        carregarLista();
-    }
-
-    public void subir(Hiperlink atual){
+    /*public void subir(Hiperlink atual){
         boolean semGrupo = SEM_GRUPO.equals(grupoSelecionado);
         Long grupoId = (!semGrupo ? grupoSelecionado : null);
         facade.mover(atual.getId(), grupoId, semGrupo, true);
@@ -135,6 +146,27 @@ public class HiperlinkBean implements Serializable{
         boolean semGrupo = SEM_GRUPO.equals(grupoSelecionado);
         Long grupoId = (!semGrupo ? grupoSelecionado : null);
         facade.mover(atual.getId(), grupoId, semGrupo, false);
+        carregarLista();
+    }*/
+
+    public String buscarNomePorId(Long id){
+        return lista.stream().filter(h -> h.getId().equals(id)).findFirst().map(Hiperlink::getName).orElse("");
+    }
+
+    public void salvarNovaOrdem(){
+        /*if(lista == null || listaIds == null){return;}
+
+        Map<Long, Hiperlink> mapa = lista.stream().collect(Collectors.toMap(Hiperlink::getId, h -> h));
+
+        for (int i=0; i < listaIds.size(); i++){
+            Hiperlink h = mapa.get(listaIds.get(i));
+            if(h != null){ h.setOrdem(i+1); }
+        }
+        facade.atualizarLista(lista);
+        FacesContext.getCurrentInstance().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_INFO,
+                        "Ordem Salva com Sucesso!!!", null));*/
+        facade.atualizarOrdem(listaIds);
         carregarLista();
     }
 
@@ -188,4 +220,8 @@ public class HiperlinkBean implements Serializable{
     public boolean isModoEdicao() {return modoEdicao;}
 
     public void setModoEdicao(boolean modoEdicao) {this.modoEdicao = modoEdicao;}
+
+    public List<Long> getListaIds(){return listaIds;}
+
+    public void setListaIds(List<Long> listaIds){this.listaIds = listaIds;}
 }

@@ -8,7 +8,7 @@ public enum Cor {
     VERMELHO("Vermelho"),
     ROSA("Rosa"),
     ROXO("Roxo"),
-    PRETO("Preto");
+    BRANCO("Branco");
 
     private final String label;
 

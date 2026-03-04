@@ -51,7 +51,7 @@ public class HiperlinkDAO extends GenericDAO<Hiperlink>{
         return em.createQuery("SELECT h FROM Hiperlink h WHERE h.grupo IS NULL ORDER BY h.ordem", Hiperlink.class).getResultList();
     }
 
-    public Hiperlink buscarVizinho(Long grupoId, boolean semGrupo, Integer ordemAtual, boolean anterior){
+    /*public Hiperlink buscarVizinho(Long grupoId, boolean semGrupo, Integer ordemAtual, boolean anterior){
         String operador = anterior ? "<" : ">";
         String direcao = anterior ? "DESC" : "ASC";
 
@@ -69,7 +69,7 @@ public class HiperlinkDAO extends GenericDAO<Hiperlink>{
             query.setParameter("grupoId", grupoId);
         }
         return query.getResultStream().findFirst().orElse(null);
-    }
+    }*/
 
     public Integer buscarMaiorOrdem(){
         return em.createQuery("SELECT MAX(h.ordem) FROM Hiperlink h", Integer.class).getSingleResult();
@@ -81,8 +81,9 @@ public class HiperlinkDAO extends GenericDAO<Hiperlink>{
             jpql.append("JOIN h.tags t ");
         }
         jpql.append("WHERE 1=1 ");
-        if (nome != null && !nome.isBlank()){
+        if (nome != null && nome.trim().length() >= 2){
             jpql.append("AND LOWER(h.name) LIKE LOWER(:nome) ");
+            //jpql.append("ORDER BY CASE WHEN LOWER(h.name) LIKE LOWER(:nomeInicio) THEN 0 ELSE 1 END, h.name");
         }
         if (grupoId != null){
             if(grupoId.equals(-1L)){
@@ -102,8 +103,9 @@ public class HiperlinkDAO extends GenericDAO<Hiperlink>{
             jpql.append("AND h.color = :cor ");
         }
         var query = em.createQuery(jpql.toString(), Hiperlink.class);
-        if (nome != null && !nome.isBlank()){
-            query.setParameter("nome", "%" + nome + "%");
+        if (nome != null && nome.trim().length() >= 2){
+            query.setParameter("nome", "%" + nome.toLowerCase().trim() + "%");
+            //query.setParameter("nomeInicio",  nome + "%");
         }
         if(grupoId != null && !grupoId.equals(-1L)){
             query.setParameter("grupoId", grupoId);

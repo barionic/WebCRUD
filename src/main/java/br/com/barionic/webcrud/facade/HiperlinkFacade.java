@@ -101,6 +101,7 @@ public class HiperlinkFacade {
         return dao.findNoGrupo();
     }
 
+    /*
     public Hiperlink buscarVizinho(Long grupoId,boolean semGrupo, Integer ordemAtual, boolean anterior){
         return dao.buscarVizinho(grupoId, semGrupo, ordemAtual, anterior);
     }
@@ -117,6 +118,21 @@ public class HiperlinkFacade {
             Integer temp = atual.getOrdem();
             atual.setOrdem(vizinho.getOrdem());
             vizinho.setOrdem(temp);
+        }
+    }
+    */
+
+    public void atualizarLista(List<Hiperlink> lista){
+        for (Hiperlink h : lista){
+            dao.update(h);
+        }
+    }
+
+    public void atualizarOrdem(List<Long> listaIds){
+        for (int i=0; i<listaIds.size(); i++){
+            Hiperlink h = dao.find(listaIds.get(i));
+            h.setOrdem(i+1);
+            dao.update(h);
         }
     }
 

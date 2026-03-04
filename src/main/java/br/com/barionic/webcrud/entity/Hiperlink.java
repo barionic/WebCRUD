@@ -28,13 +28,13 @@ public class Hiperlink implements Serializable{
 
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
-    private Cor color; //Cor.PRETO;
+    private Cor color; //= Cor.PRETO;
 
     @ManyToOne
     @JoinColumn(name = "grupo_id")
     private Grupo grupo;
 
-    @Column(name = "ordem")
+    @Column(name = "ordem", nullable = false)
     private Integer ordem;
 
     @ManyToMany

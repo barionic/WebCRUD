@@ -2,8 +2,8 @@ package br.com.barionic.webcrud.dao;
 
 import br.com.barionic.webcrud.entity.Cor;
 import br.com.barionic.webcrud.entity.Hiperlink;
+import br.com.barionic.webcrud.util.Constantes;
 import jakarta.ejb.Stateless;
-import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
@@ -51,69 +51,66 @@ public class HiperlinkDAO extends GenericDAO<Hiperlink>{
         return em.createQuery("SELECT h FROM Hiperlink h WHERE h.grupo IS NULL ORDER BY h.ordem", Hiperlink.class).getResultList();
     }
 
-    /*public Hiperlink buscarVizinho(Long grupoId, boolean semGrupo, Integer ordemAtual, boolean anterior){
-        String operador = anterior ? "<" : ">";
-        String direcao = anterior ? "DESC" : "ASC";
-
-        StringBuilder jpql = new StringBuilder("SELECT h FROM Hiperlink h WHERE h.ordem " + operador + " :ordem");
-
-        if (semGrupo){
-            jpql.append(" AND h.grupo IS NULL");
-        }
-        else if(grupoId != null){
-            jpql.append(" AND h.grupo.id = :grupoId");
-        }
-        jpql.append(" ORDER BY h.ordem ").append(direcao);
-        var query = em.createQuery(jpql.toString(), Hiperlink.class).setParameter("ordem", ordemAtual).setMaxResults(1);
-        if (!semGrupo && grupoId != null){
-            query.setParameter("grupoId", grupoId);
-        }
-        return query.getResultStream().findFirst().orElse(null);
-    }*/
-
     public Integer buscarMaiorOrdem(){
         return em.createQuery("SELECT MAX(h.ordem) FROM Hiperlink h", Integer.class).getSingleResult();
     }
 
+    public List<Hiperlink> buscarPorIds(List<Long> ids){
+        if (ids == null || ids.isEmpty()) {
+            return List.of();
+        }
+        return em.createQuery(
+                "SELECT h FROM Hiperlink h WHERE h.id IN :ids", Hiperlink.class)
+                .setParameter("ids", ids)
+                .getResultList();
+    }
+
     public List<Hiperlink> buscarComFiltro(String nome, Long grupoId, Long tagId, Cor cor){
-        StringBuilder jpql = new StringBuilder("SELECT DISTINCT h FROM Hiperlink h ");
-        if (tagId != null){
-            jpql.append("JOIN h.tags t ");
-        }
+        StringBuilder jpql = new StringBuilder();
+        jpql.append("SELECT DISTINCT h FROM Hiperlink h ");
+        boolean joinTag = tagId != null && !Constantes.SEM_TAG.equals(tagId);
+        if (joinTag) { jpql.append("JOIN h.tags t ");}
         jpql.append("WHERE 1=1 ");
-        if (nome != null && nome.trim().length() >= 2){
-            jpql.append("AND LOWER(h.name) LIKE LOWER(:nome) ");
-            //jpql.append("ORDER BY CASE WHEN LOWER(h.name) LIKE LOWER(:nomeInicio) THEN 0 ELSE 1 END, h.name");
+        // Nome
+        if (nome != null && nome.trim().length() >= 2) {
+            jpql.append("AND LOWER(h.name) LIKE :nome ");
         }
-        if (grupoId != null){
-            if(grupoId.equals(-1L)){
+        // Grupo
+        if (grupoId != null) {
+            if (Constantes.SEM_GRUPO.equals(grupoId)) {
                 jpql.append("AND h.grupo IS NULL ");
-            }else {
+            } else {
                 jpql.append("AND h.grupo.id = :grupoId ");
             }
         }
-        if (tagId != null){
-            if(tagId.equals(-1L)){
+        // Tag
+        if (tagId != null) {
+            if (Constantes.SEM_TAG.equals(tagId)) {
                 jpql.append("AND h.tags IS EMPTY ");
-            }else {
+            } else {
                 jpql.append("AND t.id = :tagId ");
             }
         }
-        if (cor != null){
+        // Cor
+        if (cor != null) {
             jpql.append("AND h.color = :cor ");
         }
-        var query = em.createQuery(jpql.toString(), Hiperlink.class);
-        if (nome != null && nome.trim().length() >= 2){
-            query.setParameter("nome", "%" + nome.toLowerCase().trim() + "%");
-            //query.setParameter("nomeInicio",  nome + "%");
+        // Ordenação padrão
+        jpql.append("ORDER BY h.ordem ASC ");
+        TypedQuery<Hiperlink> query = em.createQuery(jpql.toString(), Hiperlink.class);
+
+        //====== SETANDO PARÂMETROS ======
+        if (nome != null && nome.trim().length() >= 2) {
+            query.setParameter("nome",
+                    "%" + nome.toLowerCase().trim() + "%");
         }
-        if(grupoId != null && !grupoId.equals(-1L)){
+        if (grupoId != null && !Constantes.SEM_GRUPO.equals(grupoId)) {
             query.setParameter("grupoId", grupoId);
         }
-        if(tagId != null && !tagId.equals(-1L)){
+        if (tagId != null && !Constantes.SEM_TAG.equals(tagId)) {
             query.setParameter("tagId", tagId);
         }
-        if(cor != null){
+        if (cor != null) {
             query.setParameter("cor", cor);
         }
         return query.getResultList();

@@ -57,11 +57,6 @@ public class Hiperlink implements Serializable{
     @Column(name = "data_atualizacao")
     private LocalDateTime dataAtualizacao;
 
-    /*@PreUpdate
-    public void preUpdate(){
-        this.dataAtualizacao = LocalDateTime.now();
-    }*/
-
     public String getDataCriacaoFormatada(){
         return dataCriacao != null ? dataCriacao.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) : "";
     }

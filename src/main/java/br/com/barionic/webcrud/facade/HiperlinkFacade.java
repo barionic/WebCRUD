@@ -1,5 +1,6 @@
 package br.com.barionic.webcrud.facade;
 
+import static br.com.barionic.webcrud.util.Constantes.SEM_GRUPO;
 import br.com.barionic.webcrud.dao.GrupoDAO;
 import br.com.barionic.webcrud.dao.HiperlinkDAO;
 import br.com.barionic.webcrud.dao.TagDAO;
@@ -11,6 +12,8 @@ import jakarta.ejb.Stateless;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Stateless
 public class HiperlinkFacade {
@@ -29,15 +32,16 @@ public class HiperlinkFacade {
         validarNomeUnico(hiperlink);
         associarGrupo(hiperlink, grupoId);
         associarTags(hiperlink, tagIds);
+        boolean novo = hiperlink.getId() == null;
 
-        if(hiperlink.getId() == null){
+        if(novo){
             Integer ultimaOrdem = dao.buscarMaiorOrdem();
             hiperlink.setOrdem(ultimaOrdem == null ? 1 : ultimaOrdem + 1);
         } else{
             hiperlink.setDataAtualizacao(LocalDateTime.now());
         }
 
-        if (hiperlink.getId() == null){
+        if (novo){
             dao.create(hiperlink);
         }else{
             dao.update(hiperlink);
@@ -64,17 +68,21 @@ public class HiperlinkFacade {
     private void associarGrupo(Hiperlink hiperlink, Long grupoId){
         if (grupoId != null){
             var grupo = grupoDAO.find(grupoId);
+            if(grupo == null){
+                throw new RegraNegocioException("Grupo Inválido");
+            }
             hiperlink.setGrupo(grupo);
-        } else {
-            hiperlink.setGrupo(null);
         }
     }
 
     private void associarTags(Hiperlink hiperlink, List<Long> tagIds){
         if (tagIds != null && !tagIds.isEmpty()){
             var tags = tagDAO.buscarPorIds(tagIds);
+            if (tags.size() != tagIds.size()){
+                throw new RegraNegocioException("Uma ou mais Tags Inválidas");
+            }
             hiperlink.setTags(tags);
-        } else {
+        }else{
             hiperlink.setTags(null);
         }
     }
@@ -104,27 +112,6 @@ public class HiperlinkFacade {
         return dao.findNoGrupo();
     }
 
-    /*
-    public Hiperlink buscarVizinho(Long grupoId,boolean semGrupo, Integer ordemAtual, boolean anterior){
-        return dao.buscarVizinho(grupoId, semGrupo, ordemAtual, anterior);
-    }
-
-    public void mover(Long id, Long grupoId, boolean semGrupo, boolean anterior) {
-        Hiperlink atual = dao.find(id);
-        Hiperlink vizinho = dao.buscarVizinho(
-                grupoId,
-                semGrupo,
-                atual.getOrdem(),
-                anterior
-        );
-        if (vizinho != null){
-            Integer temp = atual.getOrdem();
-            atual.setOrdem(vizinho.getOrdem());
-            vizinho.setOrdem(temp);
-        }
-    }
-    */
-
     public void atualizarLista(List<Hiperlink> lista){
         for (Hiperlink h : lista){
             dao.update(h);
@@ -132,10 +119,23 @@ public class HiperlinkFacade {
     }
 
     public void atualizarOrdem(List<Long> listaIds){
+        var hiperlinks = dao.buscarPorIds(listaIds);
+        Map<Long, Hiperlink> mapa = hiperlinks.stream().collect(Collectors.toMap(Hiperlink::getId, h -> h));
         for (int i=0; i<listaIds.size(); i++){
-            Hiperlink h = dao.find(listaIds.get(i));
-            h.setOrdem(i+1);
-            dao.update(h);
+            Hiperlink h = mapa.get(listaIds.get(i));
+            if (h != null){
+                h.setOrdem(i+1);
+            }
+        }
+    }
+
+    public List<Hiperlink> listarPorSelecao(Long grupoSelecionado){
+        if (grupoSelecionado == null){
+            return listarTodos();
+        }else if(SEM_GRUPO.equals(grupoSelecionado)){
+            return listarSemGrupoOrdenado();
+        }else{
+            return listarPorGrupoOrdenado(grupoSelecionado);
         }
     }
 

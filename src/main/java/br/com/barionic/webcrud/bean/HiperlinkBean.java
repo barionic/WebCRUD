@@ -1,5 +1,6 @@
 package br.com.barionic.webcrud.bean;
 
+import static br.com.barionic.webcrud.util.Constantes.SEM_GRUPO;
 import br.com.barionic.webcrud.entity.Cor;
 import br.com.barionic.webcrud.entity.Grupo;
 import br.com.barionic.webcrud.entity.Hiperlink;
@@ -33,12 +34,11 @@ public class HiperlinkBean implements Serializable{
     private Long filtroTagId;
     private Cor filtroCor;
 
-    private static final Long SEM_GRUPO = -1L;
-    private static final Long SEM_TAG = -1L;
     private Long grupoSelecionado;
     private boolean mostrarLog = false;
     private boolean modoEdicao = false;
     private List<Long> listaIds;
+    private Map<Long, String> mapaNomes;
 
     @Inject
     private HiperlinkFacade facade;
@@ -123,49 +123,17 @@ public class HiperlinkBean implements Serializable{
     }
 
     public void carregarLista(){
-        if (grupoSelecionado == null){
-            lista = facade.listarTodos();
-        }
-        else if(SEM_GRUPO.equals(grupoSelecionado)){
-            lista = facade.listarSemGrupoOrdenado();
-        }
-        else{
-            lista = facade.listarPorGrupoOrdenado(grupoSelecionado);
-        }
+        lista = facade.listarPorSelecao(grupoSelecionado);
         listaIds = lista.stream().map(Hiperlink::getId).collect(Collectors.toList());
+        mapaNomes = lista.stream().collect(Collectors.toMap(Hiperlink::getId, Hiperlink::getName));
     }
-
-    /*public void subir(Hiperlink atual){
-        boolean semGrupo = SEM_GRUPO.equals(grupoSelecionado);
-        Long grupoId = (!semGrupo ? grupoSelecionado : null);
-        facade.mover(atual.getId(), grupoId, semGrupo, true);
-        carregarLista();
-    }
-
-    public void descer(Hiperlink atual){
-        boolean semGrupo = SEM_GRUPO.equals(grupoSelecionado);
-        Long grupoId = (!semGrupo ? grupoSelecionado : null);
-        facade.mover(atual.getId(), grupoId, semGrupo, false);
-        carregarLista();
-    }*/
 
     public String buscarNomePorId(Long id){
-        return lista.stream().filter(h -> h.getId().equals(id)).findFirst().map(Hiperlink::getName).orElse("");
+        //if (mapaNomes == null) return "";
+        return mapaNomes.getOrDefault(id, "");
     }
 
     public void salvarNovaOrdem(){
-        /*if(lista == null || listaIds == null){return;}
-
-        Map<Long, Hiperlink> mapa = lista.stream().collect(Collectors.toMap(Hiperlink::getId, h -> h));
-
-        for (int i=0; i < listaIds.size(); i++){
-            Hiperlink h = mapa.get(listaIds.get(i));
-            if(h != null){ h.setOrdem(i+1); }
-        }
-        facade.atualizarLista(lista);
-        FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO,
-                        "Ordem Salva com Sucesso!!!", null));*/
         facade.atualizarOrdem(listaIds);
         carregarLista();
     }
@@ -193,7 +161,7 @@ public class HiperlinkBean implements Serializable{
 
     public boolean isMostrarLog() {return mostrarLog;}
 
-    public void setMostrarLog(boolean mostrarLog) { System.out.println("Checkbox mudou para: " + mostrarLog); this.mostrarLog = mostrarLog;}
+    public void setMostrarLog(boolean mostrarLog) {this.mostrarLog = mostrarLog;}
 
 
     public String getFiltroNome() {return filtroNome;}

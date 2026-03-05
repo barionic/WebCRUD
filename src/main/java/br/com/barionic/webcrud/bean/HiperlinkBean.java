@@ -9,6 +9,7 @@ import br.com.barionic.webcrud.exception.RegraNegocioException;
 import br.com.barionic.webcrud.facade.GrupoFacade;
 import br.com.barionic.webcrud.facade.HiperlinkFacade;
 import br.com.barionic.webcrud.facade.TagFacade;
+import br.com.barionic.webcrud.util.NotaItem;
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
@@ -17,6 +18,8 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -51,6 +54,7 @@ public class HiperlinkBean implements Serializable{
 
     private Hiperlink hiperlink;
     private List<Hiperlink> lista;
+    private List<NotaItem> notes = new ArrayList<>();
 
     @PostConstruct
     public void init(){
@@ -58,10 +62,18 @@ public class HiperlinkBean implements Serializable{
         lista = facade.listarTodos();
         grupos = grupoFacade.listarTodos();
         tags = tagFacade.listarTodos();
+
+        notes.add(new NotaItem(false,""));
+
         carregarLista();
     }
 
     public void salvar(){
+        String notasTexto = notes.stream()
+                .map(n -> (n.isConcluido() ? "[x] " : "[] ") + n.getTexto())
+                .collect(Collectors.joining("\n"));
+        hiperlink.setNotes(notasTexto);
+
         try{
             facade.salvar(hiperlink, grupoId, tagIds);
             String msg = modoEdicao ? "Link Editado com Sucesso!" : "Link Salvo com Sucesso!";
@@ -81,6 +93,25 @@ public class HiperlinkBean implements Serializable{
     public void editar(Hiperlink hiperlink){
         this.hiperlink = hiperlink;
         this.grupoId = hiperlink.getGrupo() != null ? hiperlink.getGrupo().getId() : null;
+
+        if(hiperlink.getNotes() != null){
+            notes = Arrays.stream(hiperlink.getNotes().split("\\r?\\n"))
+                    .map(String::trim)
+                    .filter(l -> !l.isBlank())
+                    .map(l -> {
+                        boolean done = l.startsWith("[x]");
+                        String texto = l.replace("[x]", "")
+                                .replace("[ ]", "")
+                                .trim();
+                        return new NotaItem(done, texto);
+                    }).collect(Collectors.toList());
+        } else {
+            notes = new ArrayList<>();
+        }
+        if (notes.isEmpty()){
+            notes.add(new NotaItem(""));
+        }
+
         if (hiperlink.getTags() != null){
             this.tagIds = hiperlink.getTags().stream().map(Tag::getId).collect(Collectors.toList());
         }
@@ -100,6 +131,9 @@ public class HiperlinkBean implements Serializable{
         grupoId = null;
         tagIds = null;
         modoEdicao = false;
+
+        notes = new ArrayList<>();
+        notes.add(new NotaItem(""));
     }
 
     public void buscar(){
@@ -124,6 +158,7 @@ public class HiperlinkBean implements Serializable{
 
     public void carregarLista(){
         lista = facade.listarPorSelecao(grupoSelecionado);
+        if (lista == null){ lista = new ArrayList<>(); }
         listaIds = lista.stream().map(Hiperlink::getId).collect(Collectors.toList());
         mapaNomes = lista.stream().collect(Collectors.toMap(Hiperlink::getId, Hiperlink::getName));
     }
@@ -136,6 +171,21 @@ public class HiperlinkBean implements Serializable{
     public void salvarNovaOrdem(){
         facade.atualizarOrdem(listaIds);
         carregarLista();
+    }
+
+    public void adicionarNota(){
+        notes.add(new NotaItem(""));
+    }
+
+    public void removeNota(NotaItem nota){
+        notes.remove(nota);
+    }
+
+    public List<String> buscarSugestoes(String query){
+        return facade.buscarPorPrefixo(query)
+                .stream()
+                .map(Hiperlink::getName)
+                .collect(Collectors.toList());
     }
 
     // ==== Getters & Setters ====
@@ -192,4 +242,14 @@ public class HiperlinkBean implements Serializable{
     public List<Long> getListaIds(){return listaIds;}
 
     public void setListaIds(List<Long> listaIds){this.listaIds = listaIds;}
+
+    public List<NotaItem> getNotes(){
+        if (notes == null){
+            notes = new ArrayList<>();
+            notes.add(new NotaItem(""));
+        }
+        return notes;
+    }
+
+    public void setNotes(List<NotaItem> notes) {this.notes = notes;}
 }

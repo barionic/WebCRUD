@@ -59,9 +59,16 @@ public class HiperlinkDAO extends GenericDAO<Hiperlink>{
         if (ids == null || ids.isEmpty()) {
             return List.of();
         }
-        return em.createQuery(
-                "SELECT h FROM Hiperlink h WHERE h.id IN :ids", Hiperlink.class)
+        return em.createQuery("SELECT h FROM Hiperlink h WHERE h.id IN :ids", Hiperlink.class)
                 .setParameter("ids", ids)
+                .getResultList();
+    }
+
+    public List<Hiperlink> buscarPorPrefixos(String prefixo){
+        return em.createQuery(
+                "SELECT h FROM Hiperlink h WHERE LOWER(h.name) LIKE :p", Hiperlink.class)
+                .setParameter("p", prefixo.toLowerCase() + "%")
+                .setMaxResults(5)
                 .getResultList();
     }
 

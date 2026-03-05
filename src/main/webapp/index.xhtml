@@ -21,8 +21,27 @@
                              placeholder="Nome do Link" required="true" requiredMessage="Nome é obrigatório" styleClass="input-full"/>
                 <p:inputText value="#{hiperlinkBean.hiperlink.url}"
                              placeholder="URL do Link" required="true" requiredMessage="URL é obrigatória" styleClass="input-full"/>
-                <p:inputTextarea value="#{hiperlinkBean.hiperlink.notes}"
-                                 placeholder="Anotações em tópicos..." rows="5" autoResize="false" styleClass="input-full"/>
+
+                <h:panelGroup id="notesContainer" layout="block" styleClass="notes-editor">
+                    <ui:repeat value="#{hiperlinkBean.notes}" var="nota">
+                        <div style="display:flex; gap:6px; margin-bottom:4px;">
+                            <p:selectBooleanCheckbox value="#{nota.concluido}" />
+                            <p:inputText value="#{nota.texto}"  style="flex:1"  placeholder="Nova assunto sobre o link..."/>
+                            <p:commandButton icon="pi pi-times"
+                                             action="#{hiperlinkBean.removeNota(nota)}"
+                                             process="@this"
+                                             update=":formCadastro:notesContainer"
+                                             styleClass="danger-button"
+                                             immediate="true" />
+                        </div>
+                    </ui:repeat>
+                </h:panelGroup>
+                <p:commandButton value="+ Novo Tópico"
+                                 action="#{hiperlinkBean.adicionarNota}"
+                                 process="@this"
+                                 update=":formCadastro:notesContainer"
+                                 styleClass="save-button"/>
+
                 <p:selectOneMenu value="#{hiperlinkBean.grupoId}" style="width:100%">
                     <f:selectItem itemLabel="Sem Grupo" itemValue="#{null}" />
                     <f:selectItems value="#{hiperlinkBean.grupos}" var="g" itemLabel="#{g.grupoName}"  itemValue="#{g.id}"/>
@@ -78,8 +97,8 @@
                 <!-- Buttons -->
                 <div style="margin-top: 10px; display:flex; justify-content: space-between;">
                     <div>
-                        <p:commandButton value="Buscar" action="#{hiperlinkBean.buscar}" update="dataViewLinks" process="@form" styleClass="save-button"/>
-                        <p:commandButton value="Limpar" action="#{hiperlinkBean.limparFiltro}" update="formLista @form" process="@this" styleClass="edit-button"/>
+                        <p:commandButton value="Buscar" action="#{hiperlinkBean.buscar}" update=":formLista:dataViewLinks" process="@form" styleClass="save-button"/>
+                        <p:commandButton value="Limpar" action="#{hiperlinkBean.limparFiltro}" update=":formLista" process="@this" styleClass="edit-button"/>
                     </div>
                     <div>
                         <h:outputText value="Mostar data/hora?"/>
@@ -92,7 +111,14 @@
             </div>
         </p:card>
 
-        <p:dataView id="dataViewLinks" value="#{hiperlinkBean.lista}" var="link" layout="list">
+        <p:dataView id="dataViewLinks"
+                    value="#{hiperlinkBean.lista}"
+                    var="link"
+                    layout="list"
+                    paginator="true"
+                    rows="10"
+                    paginatorPosition="bottom"
+                    paginatorAlwaysVisible="false">
             <p:dataViewListItem>
                 <p:card styleClass="link-card">
                     <!-- Titulo -->
@@ -101,10 +127,21 @@
                     </h:outputLink>
 
                     <!-- Grupo -->
-                    <div class="link-group">
+                    <h:panelGroup layout="block" styleClass="link-group">
                         <h:outputText value="#{link.grupo.grupoName}" rendered="#{not empty link.grupo}"/>
                         <h:outputText value="Sem Grupo" rendered="#{empty link.grupo}" style="color:gray"/>
-                    </div>
+                    </h:panelGroup>
+
+                    <!-- Notas -->
+
+                    <h:panelGroup layout="block" styleClass="link-notes" rendered="#{not empty link.notes}">
+                        <ui:repeat value="#{link.notasChecklist}" var="nota">
+                            <div class="nota-item">
+                                <span>#{nota.concluido ? '✔' : '○'}</span>
+                                <span>#{nota.texto}</span>
+                            </div>
+                        </ui:repeat>
+                    </h:panelGroup>
 
                     <!-- Datas -->
                     <h:panelGroup rendered="#{hiperlinkBean.mostrarLog}">
@@ -123,19 +160,28 @@
                     </h:panelGroup>
 
                     <!-- Tags -->
-                    <div class="link-tags">
+                    <h:panelGroup layout="block" styleClass="link-tags">
                         <ui:repeat value="#{link.tags}" var="tag">
                             <span class="tag-badge">
                                 #{tag.tagName}
                             </span>
                         </ui:repeat>
                         <h:outputText value="Sem Tags" rendered="#{empty link.tags}" style="color:gray"/>
-                    </div>
+                    </h:panelGroup>
 
                     <!-- Ações -->
                     <div style="margin-top:10px">
-                        <p:commandButton value="Editar" action="#{hiperlinkBean.editar(link)}" process="@this" update=":formCadastro" styleClass="edit-button"/>
-                        <p:commandButton value="Remover" action="#{hiperlinkBean.remover(link)}" process="@this" update="@form" immediate="true" styleClass="danger-button"/>
+                        <p:commandButton value="Editar"
+                                         action="#{hiperlinkBean.editar(link)}"
+                                         process="@this" update=":formCadastro"
+                                         styleClass="edit-button"/>
+
+                        <p:commandButton value="Remover"
+                                         action="#{hiperlinkBean.remover(link)}"
+                                         process="@this"
+                                         update=":formLista:dataViewLinks :formCadastro:growl"
+                                         immediate="true"
+                                         styleClass="danger-button"/>
                     </div>
                 </p:card>
             </p:dataViewListItem>

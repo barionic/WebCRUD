@@ -76,3 +76,15 @@ body{
     color: #777;
     margin-top: 6px;
 }
+
+.link-notes{
+    margin-top:8px;
+    font-size:0.9rem;
+}
+
+.nota-item{
+    display: flex;
+    gap: 6px;
+    font-size: 0.9rem;
+    color: #555;
+}

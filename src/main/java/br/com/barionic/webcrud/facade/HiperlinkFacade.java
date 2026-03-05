@@ -37,8 +37,6 @@ public class HiperlinkFacade {
         if(novo){
             Integer ultimaOrdem = dao.buscarMaiorOrdem();
             hiperlink.setOrdem(ultimaOrdem == null ? 1 : ultimaOrdem + 1);
-        } else{
-            hiperlink.setDataAtualizacao(LocalDateTime.now());
         }
 
         if (novo){
@@ -137,6 +135,10 @@ public class HiperlinkFacade {
         }else{
             return listarPorGrupoOrdenado(grupoSelecionado);
         }
+    }
+
+    public List<Hiperlink> buscarPorPrefixo(String prefixo){
+        return dao.buscarPorPrefixos(prefixo);
     }
 
 }

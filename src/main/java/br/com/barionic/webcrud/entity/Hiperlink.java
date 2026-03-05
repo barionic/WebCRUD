@@ -1,5 +1,6 @@
 package br.com.barionic.webcrud.entity;
 
+import br.com.barionic.webcrud.util.NotaItem;
 import jakarta.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -51,6 +52,10 @@ public class Hiperlink implements Serializable{
     @PrePersist
     public void prePersist(){
         this.dataCriacao = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    public void preUpdate(){
         this.dataAtualizacao = LocalDateTime.now();
     }
 
@@ -68,6 +73,24 @@ public class Hiperlink implements Serializable{
     public String getTagsFormatadas(){
         if (tags == null || tags.isEmpty()) return "-";
         return tags.stream().map(Tag::getTagName).collect(Collectors.joining(", "));
+    }
+
+    private NotaItem parseNota(String linha){
+        boolean done = linha.startsWith("[x]");
+        String texto = linha
+                .replace("[x]", "")
+                .replace("[]", "")
+                .trim();
+        return new NotaItem(done, texto);
+    }
+
+    public List<NotaItem> getNotasChecklist(){
+        if (notes == null || notes.isBlank()){ return List.of();}
+        return Arrays.stream(notes.split("\\r?\\n"))
+                .map(String::trim)
+                .filter(l -> !l.isBlank())
+                .map(this::parseNota)
+                .collect(Collectors.toList());
     }
 
     // ==== Getters & Setters ====
@@ -136,7 +159,11 @@ public class Hiperlink implements Serializable{
     public void setDataAtualizacao(LocalDateTime dataAtualizacao) {this.dataAtualizacao = dataAtualizacao;}
 
     public List<String> getNotasEmTopicos() {
-        if (notes == null || notes.isBlank()) return List.of();
-        return Arrays.asList(notes.split("\\r?\\n"));
+        if (notes == null || notes.isBlank()){
+            return List.of();
+        }
+        return Arrays.stream(notes.split("\\r?\\n"))
+                .map(String::trim)
+                .filter(linha -> !linha.isBlank()).collect(Collectors.toList());
     }
 }

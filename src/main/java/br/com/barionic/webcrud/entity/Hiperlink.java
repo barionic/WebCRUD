@@ -2,6 +2,7 @@ package br.com.barionic.webcrud.entity;
 
 import br.com.barionic.webcrud.util.NotaItem;
 import jakarta.persistence.*;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

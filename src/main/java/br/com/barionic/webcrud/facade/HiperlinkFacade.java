@@ -138,7 +138,11 @@ public class HiperlinkFacade {
     }
 
     public List<Hiperlink> buscarPorPrefixo(String prefixo){
-        return dao.buscarPorPrefixos(prefixo);
+        return dao.buscarPorPrefixo(prefixo);
+    }
+
+    public List<Hiperlink> buscarBacklinks(String nome){
+        return dao.buscarReferencias(nome);
     }
 
 }

@@ -24,10 +24,24 @@
 
                 <h:panelGroup id="notesContainer" layout="block" styleClass="notes-editor">
                     <ui:repeat value="#{hiperlinkBean.notes}" var="nota">
-                        <div style="display:flex; gap:6px; margin-bottom:4px;">
+                        <div class="nota-row">
                             <p:selectBooleanCheckbox value="#{nota.concluido}" />
-                            <p:inputText value="#{nota.texto}"  style="flex:1"  placeholder="Nova assunto sobre o link..."/>
-                            <p:commandButton icon="pi pi-times"
+                            <p:autoComplete value="#{nota.texto}"
+                                            completeMethod="#{hiperlinkBean.buscarSugestoes}"
+                                            var="s"
+                                            itemLabel="#{s}"
+                                            itemValue="#{s}"
+                                            minQueryLength="0"
+                                            dropdown="true"
+                                            forceSelection="false"
+                                            styleClass="nota-input"
+                                            placeholder="Digite @ para linkar outro card">
+                                <p:column>
+                                    🔗 #{s}
+                                </p:column>
+                            </p:autoComplete>
+
+                            <p:commandButton icon="pi pi-trash"
                                              action="#{hiperlinkBean.removeNota(nota)}"
                                              process="@this"
                                              update=":formCadastro:notesContainer"
@@ -38,7 +52,7 @@
                 </h:panelGroup>
                 <p:commandButton value="+ Novo Tópico"
                                  action="#{hiperlinkBean.adicionarNota}"
-                                 process="@this"
+                                 process="@form"
                                  update=":formCadastro:notesContainer"
                                  styleClass="save-button"/>
 
@@ -120,7 +134,19 @@
                     paginatorPosition="bottom"
                     paginatorAlwaysVisible="false">
             <p:dataViewListItem>
-                <p:card styleClass="link-card">
+                <!-- <p:card styleClass="link-card"> -->
+                <p:card id="card-#{link.id}" styleClass="card-link">
+                    <f:passThroughAttribute name="data-nome" value="#{link.name}" />
+
+                    <!-- Backlinks -->
+                    <h:panelGroup styleClass="backlinks">
+                        <ui:repeat value="#{hiperlinkBean.buscarBacklinks(link)}" var="ref">
+                            <div class="backlink-item">
+                                ↩ #{ref.name}
+                            </div>
+                        </ui:repeat>
+                    </h:panelGroup>
+
                     <!-- Titulo -->
                     <h:outputLink value="#{link.url}" target="_blank" styleClass="link-title">
                         #{link.name}
@@ -133,12 +159,12 @@
                     </h:panelGroup>
 
                     <!-- Notas -->
-
                     <h:panelGroup layout="block" styleClass="link-notes" rendered="#{not empty link.notes}">
                         <ui:repeat value="#{link.notasChecklist}" var="nota">
                             <div class="nota-item">
                                 <span>#{nota.concluido ? '✔' : '○'}</span>
-                                <span>#{nota.texto}</span>
+                                <!--<span>#{nota.texto}</span>-->
+                                <h:outputText value="#{hiperlinkBean.formatarNota(nota.texto)}" escape="false"/>
                             </div>
                         </ui:repeat>
                     </h:panelGroup>
@@ -187,6 +213,48 @@
             </p:dataViewListItem>
         </p:dataView>
     </h:form>
+    <h:outputScript>
+        function abrirLink(nome){
+            const cards = document.querySelectorAll("[data-nome]");
+            const nomeNormalizado = nome.trim().toLowerCase();
+            for (const card of cards){
+                const cardNome = card.dataset.nome.trim().toLowerCase();
+                if (cardNome.includes(nomeNormalizado)){
+                    card.scrollIntoView({
+                        behavior: "smooth",
+                        block: "center"
+                    });
+                    card.classList.add("card-highlight");
+                    setTimeout(() => {
+                        card.classList.remove("card-highlight");
+                    },2000);
+                    return;
+                }
+            }
+            console.warn("Card não encontrado:", nome);
+        }
+
+        function mostrarPreview(event, element, nome){
+
+            const preview = document.createElement("div");
+            preview.classList.add("link-preview");
+            preview.innerText = nome;
+
+            document.body.appendChild(preview);
+
+            const rect = element.getBoundingClientRect();
+
+            preview.style.left = (event.pageX + 10) + "px";
+            preview.style.top = (event.pageY + 10) + "px";
+
+            element.previewElement = preview;
+        }
+
+        function esconderPreview(element){
+            if (element.previewElement){
+                element.previewElement.remove();
+            }
+        }
+    </h:outputScript>
 </h:body>
 </html>
-

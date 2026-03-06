@@ -70,8 +70,10 @@ public class HiperlinkBean implements Serializable{
 
     public void salvar(){
         String notasTexto = notes.stream()
-                .map(n -> (n.isConcluido() ? "[x] " : "[] ") + n.getTexto())
+                .filter(n -> n.getTexto() != null && !n.getTexto().trim().isEmpty())
+                .map(n -> (n.isConcluido() ? "[x] " : "[] ") + n.getTexto().trim())
                 .collect(Collectors.joining("\n"));
+
         hiperlink.setNotes(notasTexto);
 
         try{
@@ -133,7 +135,7 @@ public class HiperlinkBean implements Serializable{
         modoEdicao = false;
 
         notes = new ArrayList<>();
-        notes.add(new NotaItem(""));
+        notes.add(new NotaItem(false,""));
     }
 
     public void buscar(){
@@ -181,11 +183,62 @@ public class HiperlinkBean implements Serializable{
         notes.remove(nota);
     }
 
+    /*
+    public List<String> buscarSugestoes(String query){ //Busca-Perfeita-PorPrefixo;
+        if (query == null){ return List.of(); }
+
+        if (query.contains("@")){
+            String prefixo = query.substring(query.lastIndexOf("@")+1);
+            return facade.buscarPorPrefixo(prefixo)
+                    .stream()
+                    .map(h -> "@" + h.getName())
+                    .collect(Collectors.toList());
+        }
+        return List.of();
+    }
+    */
+
     public List<String> buscarSugestoes(String query){
-        return facade.buscarPorPrefixo(query)
+
+        if (query == null || !query.contains("@")){
+            return List.of();
+        }
+
+        String termo = query.substring(query.lastIndexOf("@")+1).toLowerCase();
+
+        return facade.listarTodos()
                 .stream()
                 .map(Hiperlink::getName)
+                .filter(nome -> nome.toLowerCase().contains(termo))
+                .map(nome -> "@" + nome)
                 .collect(Collectors.toList());
+    }
+
+    public void carregarNotas(){
+        notes = new ArrayList<>();
+        if (hiperlink.getNotes() == null || hiperlink.getNotes().isEmpty()){
+            notes.add(new NotaItem(false, ""));
+            return;
+        }
+        String[] linhas = hiperlink.getNotes().split("\n");
+        for (String linha : linhas){
+            boolean concluido = linha.startsWith("[x]");
+            String texto = linha.replace("[x]", "").replace("[]", "").trim();
+            notes.add(new NotaItem(concluido, texto));
+        }
+    }
+
+    public String formatarNota(String texto){
+        if (texto==null){return "";}
+        texto = texto.replaceAll("@([a-zA-Z0-9À-ÿ _-]+)", "<a href='javascript:void(0)' class='nota-card-link' onclick=\"abrirLink('$1')\" onmouseover=\"mostrarPreview(event,this,'$1')\" onmouseout=\"esconderPreview(this)\">@$1</a>");
+        texto = texto.replaceAll("\\*\\*(.*?)\\*\\*", "<b>$1</b>");
+        texto = texto.replaceAll("`(.*?)`", "<code>$1</code>");
+
+        return texto;
+    }
+
+    public List<Hiperlink> buscarBacklinks(Hiperlink link){
+        return facade.buscarBacklinks(link.getName());
     }
 
     // ==== Getters & Setters ====

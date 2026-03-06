@@ -64,11 +64,21 @@ public class HiperlinkDAO extends GenericDAO<Hiperlink>{
                 .getResultList();
     }
 
-    public List<Hiperlink> buscarPorPrefixos(String prefixo){
+    public List<Hiperlink> buscarPorPrefixo(String prefixo){
+        if (prefixo == null || prefixo.isBlank()){
+            return List.of();
+        }
+        prefixo = prefixo.replace("@", "");
         return em.createQuery(
                 "SELECT h FROM Hiperlink h WHERE LOWER(h.name) LIKE :p", Hiperlink.class)
                 .setParameter("p", prefixo.toLowerCase() + "%")
                 .setMaxResults(5)
+                .getResultList();
+    }
+
+    public List<Hiperlink> buscarReferencias(String nome){
+        return em.createQuery("SELECT h FROM Hiperlink h WHERE h.notes LIKE :ref", Hiperlink.class)
+                .setParameter("ref", "%@" + nome + "%")
                 .getResultList();
     }
 

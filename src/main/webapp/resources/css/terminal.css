@@ -88,3 +88,58 @@ body{
     font-size: 0.9rem;
     color: #555;
 }
+
+.notes-editor{
+    margin-top: 10px;
+}
+
+.nota-row{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.nota-input{
+    flex:1;
+}
+
+.nota-row .ui-inputfield{
+    width: 100%;
+}
+
+.nota-card-link{
+    color: #00ff9c;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.nota-card link:hover{
+    text-decoration: underline;
+}
+
+.card-highlight{
+    border: 2px solid #00ff9c;
+    box-shadow: 0 0 10px #00ff9c;
+}
+
+.link-preview{
+    position: absolute;
+    background: #111;
+    border: 1px solid #333;
+    padding: 10px;
+    border-radius: 6px;
+    max-width: 250px;
+    z-index:999;
+    font-size: 0.85rem;
+}
+
+.card-highlight{
+    animation: highlightFlash 2s ease;
+}
+
+@keyframes highlightFlash{
+    0%{box-shadow:0 0 0px transparent}
+    50%{box-shadow:0 0 20px #00ff9c}
+    100%{box-shadow:0 0 0px transparent}
+}

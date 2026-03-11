@@ -37,9 +37,6 @@ public class HiperlinkFacade {
         if(novo){
             Integer ultimaOrdem = dao.buscarMaiorOrdem();
             hiperlink.setOrdem(ultimaOrdem == null ? 1 : ultimaOrdem + 1);
-        }
-
-        if (novo){
             dao.create(hiperlink);
         }else{
             dao.update(hiperlink);

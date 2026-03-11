@@ -83,6 +83,7 @@
         </h:form>
 
         <h:form id="formLista">
+
         <p:card header="Filtrar" styleClass="main-card">
             <div class="form-grid">
                 <!-- Nome -->
@@ -126,6 +127,7 @@
         </p:card>
 
         <p:dataView id="dataViewLinks"
+                    widgetVar="dataViewLinks"
                     value="#{hiperlinkBean.lista}"
                     var="link"
                     layout="list"
@@ -133,10 +135,10 @@
                     rows="10"
                     paginatorPosition="bottom"
                     paginatorAlwaysVisible="false">
+            <p:ajax event="page" oncomplete="scrollParaDestino()" />
             <p:dataViewListItem>
-                <!-- <p:card styleClass="link-card"> -->
-                <p:card id="card-#{link.id}" styleClass="card-link">
-                    <f:passThroughAttribute name="data-nome" value="#{link.name}" />
+                <div class="card-link" data-id="#{link.id}" data-nome="#{link.name}">
+                <p:card>
 
                     <!-- Backlinks -->
                     <h:panelGroup styleClass="backlinks">
@@ -200,6 +202,7 @@
                         <p:commandButton value="Editar"
                                          action="#{hiperlinkBean.editar(link)}"
                                          process="@this" update=":formCadastro"
+                                         oncomplete="window.scrollTo({top:0,behavior:'smooth'})"
                                          styleClass="edit-button"/>
 
                         <p:commandButton value="Remover"
@@ -210,51 +213,78 @@
                                          styleClass="danger-button"/>
                     </div>
                 </p:card>
+                </div>
             </p:dataViewListItem>
         </p:dataView>
     </h:form>
-    <h:outputScript>
+    <h:outputScript target="body">
+        //<![CDATA[
+        const listaIds = #{empty hiperlinkBean.listaIdsJSON ? '[]' : hiperlinkBean.listaIdsJSON};
+        const listaLinks = #{empty hiperlinkBean.listaLinksJSON ? '[]' : hiperlinkBean.listaLinksJSON};
+        let destinoCardId = null;
+        const indexPorId = {};
+        listaIds.forEach((id, index) => {
+            indexPorId[id] = index;
+        });
+
         function abrirLink(nome){
-            const cards = document.querySelectorAll("[data-nome]");
-            const nomeNormalizado = nome.trim().toLowerCase();
-            for (const card of cards){
-                const cardNome = card.dataset.nome.trim().toLowerCase();
-                if (cardNome.includes(nomeNormalizado)){
-                    card.scrollIntoView({
-                        behavior: "smooth",
-                        block: "center"
-                    });
-                    card.classList.add("card-highlight");
-                    setTimeout(() => {
-                        card.classList.remove("card-highlight");
-                    },2000);
-                    return;
-                }
+            const nomeNormalizado = nome.replace("@","").trim().toLowerCase();
+            const link = listaLinks.find(l =>
+                l.nome.toLowerCase() === nomeNormalizado
+            );
+            if(!link){
+                console.warn("Link não encontrado:", nome);
+                return;
             }
-            console.warn("Card não encontrado:", nome);
+            const id = link.id;
+            const index = indexPorId[id];
+            if(index === undefined) return;
+            const page = Math.floor(index / 10);
+            destinoCardId = id;
+            PF('dataViewLinks').getPaginator().setPage(page);
+            scrollParaDestino();
         }
 
+        function scrollParaDestino(){
+            if(!destinoCardId) return;
+            const card = [...document.querySelectorAll(".card-link")]
+                .find(el => el.dataset.id == destinoCardId);
+            if(!card) return;
+            card.scrollIntoView({
+                behavior: "smooth",
+                block: "center"
+            });
+            card.classList.add("card-highlight");
+            setTimeout(() => {
+                card.classList.remove("card-highlight");
+            }, 2000);
+            destinoCardId = null;
+        }
+
+        $(document).on("pfAjaxComplete", function () {
+            document.querySelectorAll(".link-preview")
+                .forEach(p => p.remove());
+        });
+
         function mostrarPreview(event, element, nome){
-
+            esconderPreview(element);
             const preview = document.createElement("div");
-            preview.classList.add("link-preview");
+            preview.className = "link-preview";
             preview.innerText = nome;
-
             document.body.appendChild(preview);
-
-            const rect = element.getBoundingClientRect();
-
             preview.style.left = (event.pageX + 10) + "px";
             preview.style.top = (event.pageY + 10) + "px";
-
             element.previewElement = preview;
         }
 
         function esconderPreview(element){
-            if (element.previewElement){
-                element.previewElement.remove();
-            }
+            if(!element.previewElement) return;
+            element.previewElement.remove();
+            element.previewElement = null;
         }
+
+        //]]>
     </h:outputScript>
 </h:body>
 </html>
+

@@ -135,11 +135,11 @@ body{
 }
 
 .card-highlight{
-    animation: highlightFlash 2s ease;
+    animation: pulseCard 1.6s ease;
 }
 
-@keyframes highlightFlash{
-    0%{box-shadow:0 0 0px transparent}
-    50%{box-shadow:0 0 20px #00ff9c}
-    100%{box-shadow:0 0 0px transparent}
+@keyframes pulseCard{
+    0% { box-shadow:0 0 0px #4dabf7; }
+    50% { box-shadow:0 0 25px #4dabf7; }
+    100% { box-shadow:0 0 0px #4dabf7; }
 }

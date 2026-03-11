@@ -159,12 +159,4 @@ public class Hiperlink implements Serializable{
 
     public void setDataAtualizacao(LocalDateTime dataAtualizacao) {this.dataAtualizacao = dataAtualizacao;}
 
-    public List<String> getNotasEmTopicos() {
-        if (notes == null || notes.isBlank()){
-            return List.of();
-        }
-        return Arrays.stream(notes.split("\\r?\\n"))
-                .map(String::trim)
-                .filter(linha -> !linha.isBlank()).collect(Collectors.toList());
-    }
 }

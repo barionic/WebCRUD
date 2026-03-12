@@ -168,3 +168,34 @@ body{
     background:#00ff9c;
     color:black;
 }
+
+.backlink-header{
+    cursor:pointer;
+    font-size:0.85rem;
+    color:#8bd5ff;
+    margin-bottom:4px;
+}
+
+.backlink-list{
+    display:none;
+    margin-left:10px;
+}
+
+.backlink-list.open{
+    display:block;
+}
+
+.backlink-item{
+    cursor:pointer;
+    font-size:0.85rem;
+    color:#9fd3ff;
+}
+
+.backlink-item:hover{
+    text-decoration:underline;
+}
+
+.backlink-header{
+    display:flex;
+    justify-content:space-between;
+}

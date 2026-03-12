@@ -133,12 +133,19 @@
                 <p:card>
 
                     <!-- Backlinks -->
-                    <h:panelGroup styleClass="backlinks">
-                        <ui:repeat value="#{hiperlinkBean.buscarBacklinks(link)}" var="ref">
-                            <div class="backlink-item">
-                                ↩ #{ref.name}
-                            </div>
-                        </ui:repeat>
+                    <h:panelGroup rendered="#{not empty hiperlinkBean.buscarBacklinks(link)}" styleClass="backlinks">
+                        <div class="backlink-header" onclick="this.nextElementSibling.classList.toggle('open')">
+                            Mencionado em
+                            (#{hiperlinkBean.buscarBacklinks(link).size()})
+                            ⏷
+                        </div>
+                        <div class="backlink-list">
+                            <ui:repeat value="#{hiperlinkBean.buscarBacklinks(link)}" var="ref">
+                                <div class="backlink-item" onclick="abrirLink('#{ref.name}')">
+                                    ↩ #{ref.name}
+                                </div>
+                            </ui:repeat>
+                        </div>
                     </h:panelGroup>
 
                     <!-- Titulo -->

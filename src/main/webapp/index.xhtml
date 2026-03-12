@@ -8,6 +8,7 @@
 <h:head>
     <title>Link Organizer</title>
     <h:outputStylesheet library="css" name="terminal.css"/>
+    <h:outputScript library="js" name="link-organizer.js"/>
 </h:head>
 <h:body>
     <div class="app-header">
@@ -26,20 +27,11 @@
                     <ui:repeat value="#{hiperlinkBean.notes}" var="nota">
                         <div class="nota-row">
                             <p:selectBooleanCheckbox value="#{nota.concluido}" />
-                            <p:autoComplete value="#{nota.texto}"
-                                            completeMethod="#{hiperlinkBean.buscarSugestoes}"
-                                            var="s"
-                                            itemLabel="#{s}"
-                                            itemValue="#{s}"
-                                            minQueryLength="0"
-                                            dropdown="true"
-                                            forceSelection="false"
-                                            styleClass="nota-input"
-                                            placeholder="Digite @ para linkar outro card">
-                                <p:column>
-                                    🔗 #{s}
-                                </p:column>
-                            </p:autoComplete>
+
+                            <p:inputTextarea value="#{nota.texto}"
+                                             styleClass="nota-input mention-editor"
+                                             autoResize="false"
+                                             placeholder="Digite @ para linkar outro card"/>
 
                             <p:commandButton icon="pi pi-trash"
                                              action="#{hiperlinkBean.removeNota(nota)}"
@@ -218,73 +210,17 @@
         </p:dataView>
     </h:form>
     <h:outputScript target="body">
-        //<![CDATA[
         const listaIds = #{empty hiperlinkBean.listaIdsJSON ? '[]' : hiperlinkBean.listaIdsJSON};
         const listaLinks = #{empty hiperlinkBean.listaLinksJSON ? '[]' : hiperlinkBean.listaLinksJSON};
-        let destinoCardId = null;
+        const todosLinks = #{empty hiperlinkBean.todosLinksJSON ? '[]' : hiperlinkBean.todosLinksJSON};
+
         const indexPorId = {};
+
         listaIds.forEach((id, index) => {
             indexPorId[id] = index;
         });
-
-        function abrirLink(nome){
-            const nomeNormalizado = nome.replace("@","").trim().toLowerCase();
-            const link = listaLinks.find(l =>
-                l.nome.toLowerCase() === nomeNormalizado
-            );
-            if(!link){
-                console.warn("Link não encontrado:", nome);
-                return;
-            }
-            const id = link.id;
-            const index = indexPorId[id];
-            if(index === undefined) return;
-            const page = Math.floor(index / 10);
-            destinoCardId = id;
-            PF('dataViewLinks').getPaginator().setPage(page);
-            scrollParaDestino();
-        }
-
-        function scrollParaDestino(){
-            if(!destinoCardId) return;
-            const card = [...document.querySelectorAll(".card-link")]
-                .find(el => el.dataset.id == destinoCardId);
-            if(!card) return;
-            card.scrollIntoView({
-                behavior: "smooth",
-                block: "center"
-            });
-            card.classList.add("card-highlight");
-            setTimeout(() => {
-                card.classList.remove("card-highlight");
-            }, 2000);
-            destinoCardId = null;
-        }
-
-        $(document).on("pfAjaxComplete", function () {
-            document.querySelectorAll(".link-preview")
-                .forEach(p => p.remove());
-        });
-
-        function mostrarPreview(event, element, nome){
-            esconderPreview(element);
-            const preview = document.createElement("div");
-            preview.className = "link-preview";
-            preview.innerText = nome;
-            document.body.appendChild(preview);
-            preview.style.left = (event.pageX + 10) + "px";
-            preview.style.top = (event.pageY + 10) + "px";
-            element.previewElement = preview;
-        }
-
-        function esconderPreview(element){
-            if(!element.previewElement) return;
-            element.previewElement.remove();
-            element.previewElement = null;
-        }
-
-        //]]>
     </h:outputScript>
+    <div id="mention-menu" class="mention-menu"></div>
 </h:body>
 </html>
 

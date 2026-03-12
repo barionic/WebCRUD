@@ -1,6 +1,5 @@
 package br.com.barionic.webcrud.bean;
 
-import static br.com.barionic.webcrud.util.Constantes.SEM_GRUPO;
 import br.com.barionic.webcrud.entity.Cor;
 import br.com.barionic.webcrud.entity.Grupo;
 import br.com.barionic.webcrud.entity.Hiperlink;
@@ -16,13 +15,13 @@ import jakarta.faces.context.FacesContext;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-import org.primefaces.PrimeFaces;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Named("hiperlinkBean")
@@ -186,18 +185,17 @@ public class HiperlinkBean implements Serializable {
     }
 
     public List<String> buscarSugestoes(String query) {
-
-        if (query == null || !query.contains("@")) {
-            return List.of();
-        }
-
-        String termo = query.substring(query.lastIndexOf("@") + 1).toLowerCase();
+        if (query == null) return List.of();
+        int pos = query.lastIndexOf("@");
+        if (pos == -1) return List.of();
+        String termo = query.substring(pos + 1).toLowerCase();
+        if (termo.isBlank()) return List.of();
 
         return facade.listarTodos()
                 .stream()
                 .map(Hiperlink::getName)
                 .filter(nome -> nome.toLowerCase().contains(termo))
-                .map(nome -> "@" + nome)
+                .limit(8)
                 .collect(Collectors.toList());
     }
 
@@ -216,10 +214,23 @@ public class HiperlinkBean implements Serializable {
     }
 
     public String formatarNota(String texto) {
-        if (texto == null) {
-            return "";
+        if (texto == null) return "";
+
+        List<String> nomes = facade.listarTodos()
+                .stream()
+                .map(Hiperlink::getName)
+                .sorted((a,b) -> Integer.compare(b.length(), a.length()))
+                .collect(Collectors.toList());
+
+        for (String nome : nomes){
+            texto = texto.replaceAll(
+                    "@" + Pattern.quote(nome) + "\\b",
+                    "<a href='javascript:void(0)' class='nota-card-link' onclick=\"abrirLink('" + nome + "')\" onmouseover=\"mostrarPreview(event,this,'" + nome + "')\" onmouseout=\"esconderPreview(this)\">@" + nome + "</a>"
+            );
         }
-        texto = texto.replaceAll("@([a-zA-Z0-9À-ÿ _-]+)", "<a href='javascript:void(0)' class='nota-card-link' onclick=\"abrirLink('$1')\" onmouseover=\"mostrarPreview(event,this,'$1')\" onmouseout=\"esconderPreview(this)\">@$1</a>");
+
+        //@([a-zA-Z0-9À-ÿ _-]+)
+        //texto = texto.replaceAll("@([^@]+?)(?=@|$)", "<a href='javascript:void(0)' class='nota-card-link' onclick=\"abrirLink('$1')\" onmouseover=\"mostrarPreview(event,this,'$1')\" onmouseout=\"esconderPreview(this)\">@$1</a>");
         texto = texto.replaceAll("\\*\\*(.*?)\\*\\*", "<b>$1</b>");
         texto = texto.replaceAll("`(.*?)`", "<code>$1</code>");
 
@@ -242,6 +253,18 @@ public class HiperlinkBean implements Serializable {
                         l.getId(),
                         l.getName().replace("\"", "\\\"")))
                 .collect(Collectors.joining(",", "[", "]"));
+    }
+
+    public String getTodosLinksJSON() {
+        return facade.listarTodos()
+                .stream()
+                .map(Hiperlink::getName)
+                .map(n -> "\"" + n.replace("\"","\\\"") + "\"")
+                .collect(Collectors.joining(",", "[", "]"));
+    }
+
+    public void onMentionSelect(org.primefaces.event.SelectEvent<String> event){
+        //impedir comportamento padrão
     }
 
     // ==== Getters & Setters ====

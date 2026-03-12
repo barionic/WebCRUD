@@ -112,6 +112,7 @@ body{
     color: #00ff9c;
     text-decoration: none;
     font-weight: bold;
+    cursor:pointer;
 }
 
 .nota-card link:hover{
@@ -142,4 +143,23 @@ body{
     0% { box-shadow:0 0 0px #4dabf7; }
     50% { box-shadow:0 0 25px #4dabf7; }
     100% { box-shadow:0 0 0px #4dabf7; }
+}
+
+.mention-menu{
+    position:absolute;
+    background:#1e293b;
+    border:1px solid #334155;
+    border-radius:6px;
+    padding:4px;
+    display:none;
+    z-index:9999;
+}
+
+.mention-item{
+    padding:4px 8px;
+    cursor:pointer;
+}
+
+.mention-item:hover{
+    background:#334155;
 }

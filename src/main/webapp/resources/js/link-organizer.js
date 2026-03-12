@@ -1,4 +1,6 @@
 let destinoCardId = null;
+let selectedIndex = -1;
+let sugestoesAtuais = [];
 
 function abrirLink(nome){
     const nomeNormalizado = nome.replace("@","").trim().toLowerCase();
@@ -65,50 +67,75 @@ document.addEventListener("DOMContentLoaded", function(){
         const textarea = e.target;
         const valor = textarea.value;
         const pos = textarea.selectionStart;
-
         const antes = valor.substring(0, pos);
-
         const match = antes.match(/@([\wÀ-ÿ ]*)$/);
-
         if (!match){
             mentionMenu.style.display="none";
             return;
         }
         const termo = match[1].toLowerCase();
-
-        const lista = todosLinks
+        sugestoesAtuais = todosLinks
             .filter(nome => nome.toLowerCase().includes(termo))
             .slice(0,8);
-
-        if (lista.lenght===0){
+        if (sugestoesAtuais.length === 0){
             mentionMenu.style.display="none";
             return;
         }
-
         mentionMenu.innerHTML="";
-
-        lista.forEach(nome =>{
-            const item = document.createElement("div");
+        selectedIndex = -1;
+        sugestoesAtuais.forEach((nome)=>{
+            const item=document.createElement("div");
             item.className="mention-item";
             item.innerText="@"+nome;
-
             item.onclick=()=>{
-                const inicio = antes.replace(/@([\wÀ-ÿ ]*)$/,"@"+nome+" ");
-                textarea.value = inicio + valor.substring(pos);
-                mentionMenu.style.display="none";
-                textarea.focus();
+                inserirMention(textarea, valor, antes, pos, nome);
             };
             mentionMenu.appendChild(item);
         });
-
         const rect = textarea.getBoundingClientRect();
-
         mentionMenu.style.left = rect.left+"px";
         mentionMenu.style.top = rect.bottom+"px";
-
         mentionMenu.style.display = "block";
-
         currentTextarea = textarea;
+    });
 
+    document.addEventListener("keydown", function(e){
+        if(!mentionMenu || mentionMenu.style.display !== "block") return;
+        const items = mentionMenu.querySelectorAll(".mention-item");
+        if(items.length === 0) return;
+        if(e.key === "ArrowDown"){
+            e.preventDefault();
+            selectedIndex = (selectedIndex + 1) % items.length;
+        }
+        else if(e.key === "ArrowUp"){
+            e.preventDefault();
+            selectedIndex = (selectedIndex - 1 + items.length) % items.length;
+        }
+        else if(e.key === "Enter"){
+            if(selectedIndex >= 0){
+                e.preventDefault();
+                const nome = sugestoesAtuais[selectedIndex];
+                inserirMention(
+                    currentTextarea,
+                    currentTextarea.value,
+                    currentTextarea.value.substring(0,currentTextarea.selectionStart),
+                    currentTextarea.selectionStart,
+                    nome
+                );
+            }
+        }
+        else if(e.key === "Escape"){
+            mentionMenu.style.display="none";
+        }
+        items.forEach((item,i)=>{
+            item.classList.toggle("mention-selected", i === selectedIndex);
+        });
     });
 });
+
+function inserirMention(textarea, valor, antes, pos, nome){
+    const inicio = antes.replace(/@([\wÀ-ÿ ]*)$/, "@"+nome+" ");
+    textarea.value = inicio + valor.substring(pos);
+    mentionMenu.style.display="none";
+    textarea.focus();
+}

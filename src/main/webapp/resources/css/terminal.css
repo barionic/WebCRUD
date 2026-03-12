@@ -163,3 +163,8 @@ body{
 .mention-item:hover{
     background:#334155;
 }
+
+.mention-selected{
+    background:#00ff9c;
+    color:black;
+}

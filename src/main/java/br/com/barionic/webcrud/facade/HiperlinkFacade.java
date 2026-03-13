@@ -4,9 +4,12 @@ import static br.com.barionic.webcrud.util.Constantes.SEM_GRUPO;
 import br.com.barionic.webcrud.dao.GrupoDAO;
 import br.com.barionic.webcrud.dao.HiperlinkDAO;
 import br.com.barionic.webcrud.dao.TagDAO;
+import br.com.barionic.webcrud.dto.LinkPreviewDTO;
 import br.com.barionic.webcrud.entity.Cor;
 import br.com.barionic.webcrud.entity.Hiperlink;
+import br.com.barionic.webcrud.entity.Tag;
 import br.com.barionic.webcrud.exception.RegraNegocioException;
+import br.com.barionic.webcrud.util.NotaItem;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 
@@ -140,6 +143,38 @@ public class HiperlinkFacade {
 
     public List<Hiperlink> buscarBacklinks(String nome){
         return dao.buscarReferencias(nome);
+    }
+
+    public LinkPreviewDTO toPreviewDTO(Hiperlink h){
+
+        String grupo = h.getGrupo() != null
+                ? h.getGrupo().getGrupoName()
+                : "Sem Grupo";
+
+        List<String> tags = h.getTags() == null
+                ? List.of()
+                : h.getTags()
+                    .stream()
+                    .limit(3)
+                    .map(Tag::getTagName)
+                    .collect(Collectors.toList());
+
+        List<String> notas = h.getNotasChecklist() == null
+                ? List.of()
+                : h.getNotasChecklist()
+                    .stream()
+                    .limit(3)
+                    .map(NotaItem::getTexto)
+                    .collect(Collectors.toList());
+
+        return new LinkPreviewDTO(
+                h.getId(),
+                h.getName(),
+                h.getUrl(),
+                grupo,
+                tags,
+                notas
+        );
     }
 
 }

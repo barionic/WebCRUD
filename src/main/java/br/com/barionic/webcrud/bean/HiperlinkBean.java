@@ -1,5 +1,6 @@
 package br.com.barionic.webcrud.bean;
 
+import br.com.barionic.webcrud.dto.LinkPreviewDTO;
 import br.com.barionic.webcrud.entity.Cor;
 import br.com.barionic.webcrud.entity.Grupo;
 import br.com.barionic.webcrud.entity.Hiperlink;
@@ -9,6 +10,7 @@ import br.com.barionic.webcrud.facade.GrupoFacade;
 import br.com.barionic.webcrud.facade.HiperlinkFacade;
 import br.com.barionic.webcrud.facade.TagFacade;
 import br.com.barionic.webcrud.util.NotaItem;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
@@ -54,6 +56,7 @@ public class HiperlinkBean implements Serializable {
     private Hiperlink hiperlink;
     private List<Hiperlink> lista;
     private List<NotaItem> notes = new ArrayList<>();
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @PostConstruct
     public void init() {
@@ -247,6 +250,7 @@ public class HiperlinkBean implements Serializable {
                 .collect(Collectors.joining(",", "[", "]"));
     }
 
+    /*
     public String getListaLinksJSON() {
         return lista.stream()
                 .map(l -> {
@@ -280,6 +284,20 @@ public class HiperlinkBean implements Serializable {
                     );
                 })
                 .collect(Collectors.joining(",", "[", "]"));
+    }
+    */
+
+    public String getListaLinksJSON() {
+        try {
+
+            List<LinkPreviewDTO> listaDTO =
+                    lista.stream()
+                            .map(facade::toPreviewDTO)
+                            .collect(Collectors.toList());
+            return mapper.writeValueAsString(listaDTO);
+        } catch (Exception e) {
+            throw new RegraNegocioException("Erro ao gerar JSON dos links.");
+        }
     }
 
     public String getTodosLinksJSON() {

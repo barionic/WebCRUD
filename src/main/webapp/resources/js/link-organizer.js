@@ -52,6 +52,14 @@ function mostrarPreview(event, element, nome){
     preview.className = "link-preview";
     let html = `<strong>${link.nome}</strong><br>`;
     if(link.url){
+        try{
+            const urlObj = new URL(link.url);
+            const favicon = urlObj.origin + "/favicon.ico";
+            html += `<img src="${favicon}"
+                     onerror="this.style.display='none'"
+                     style="width:14px;height:14px;margin-right:6px;vertical-align:middle;">`;
+
+        }catch(e){}
         html += `<small>${link.url}</small><br>`;
     }
     if(link.tags && link.tags.length > 0){

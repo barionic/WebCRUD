@@ -206,3 +206,19 @@ body{
     display:flex;
     justify-content:space-between;
 }
+
+.notes-header{
+    cursor:pointer;
+    font-weight:bold;
+    margin-top:6px;
+}
+
+.notes-list{
+    max-height:0;
+    overflow:hidden;
+    transition:max-height 0.25s ease;
+}
+
+.notes-list.open{
+    max-height:500px;
+}

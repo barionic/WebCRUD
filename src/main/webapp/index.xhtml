@@ -163,14 +163,20 @@
                     </h:panelGroup>
 
                     <!-- Notas -->
-                    <h:panelGroup layout="block" styleClass="link-notes" rendered="#{not empty link.notes}">
-                        <ui:repeat value="#{link.notasChecklist}" var="nota">
-                            <div class="nota-item">
-                                <span>#{nota.concluido ? '✔' : '○'}</span>
-                                <!--<span>#{nota.texto}</span>-->
-                                <h:outputText value="#{hiperlinkBean.formatarNota(nota.texto)}" escape="false"/>
-                            </div>
-                        </ui:repeat>
+                    <h:panelGroup rendered="#{not empty link.notasChecklist}" styleClass="notes">
+                        <div class="notes-header" onclick="this.nextElementSibling.classList.toggle('open')">
+                            Notas
+                            (#{link.notasChecklist.size()})
+                            ⏷
+                        </div>
+                        <div class="notes-list">
+                            <ui:repeat value="#{link.notasChecklist}" var="nota">
+                                <div class="nota-item">
+                                    <span>#{nota.concluido ? '✔' : '○'}</span>
+                                    <h:outputText value="#{hiperlinkBean.formatarNota(nota.texto)}" escape="false"/>
+                                </div>
+                            </ui:repeat>
+                        </div>
                     </h:panelGroup>
 
                     <!-- Datas -->

@@ -19,10 +19,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -57,6 +54,7 @@ public class HiperlinkBean implements Serializable {
     private List<Hiperlink> lista;
     private List<NotaItem> notes = new ArrayList<>();
     private final ObjectMapper mapper = new ObjectMapper();
+    private Map<Long, List<Hiperlink>> backlinksCache = new HashMap<>();
 
     @PostConstruct
     public void init() {
@@ -161,6 +159,7 @@ public class HiperlinkBean implements Serializable {
     }
 
     public void carregarLista() {
+        backlinksCache.clear();
         lista = facade.listarPorSelecao(grupoSelecionado);
         if (lista == null) {
             lista = new ArrayList<>();
@@ -240,8 +239,13 @@ public class HiperlinkBean implements Serializable {
         return texto;
     }
 
-    public List<Hiperlink> buscarBacklinks(Hiperlink link) {
-        return facade.buscarBacklinks(link.getName());
+    public List<Hiperlink> buscarBacklinks(Hiperlink link){
+        if (backlinksCache.containsKey(link.getId())){
+            return backlinksCache.get(link.getId());
+        }
+        List<Hiperlink> lista = facade.buscarBacklinks(link.getName());
+        backlinksCache.put(link.getId(), lista);
+        return lista;
     }
 
     public String getListaIdsJSON() {
@@ -249,43 +253,6 @@ public class HiperlinkBean implements Serializable {
                 .map(l -> l.getId().toString())
                 .collect(Collectors.joining(",", "[", "]"));
     }
-
-    /*
-    public String getListaLinksJSON() {
-        return lista.stream()
-                .map(l -> {
-                    String grupo = l.getGrupo() != null
-                            ? l.getGrupo().getGrupoName()
-                            : "Sem Grupo";
-                    List<String> notas = l.getNotasChecklist()
-                            .stream()
-                            .limit(2)
-                            .map(n -> n.getTexto().replace("\"","\\\""))
-                            .collect(Collectors.toList());
-                    List<String> tags = l.getTags()
-                            .stream()
-                            .limit(3)
-                            .map(t -> t.getTagName().replace("\"","\\\""))
-                            .collect(Collectors.toList());
-                    String tagsJson = tags.stream()
-                            .map(t -> "\"" + t + "\"")
-                            .collect(Collectors.joining(",", "[", "]"));
-                    String notasJson = notas.stream()
-                            .map(n -> "\"" + n + "\"")
-                            .collect(Collectors.joining(",", "[", "]"));
-                    return String.format(
-                            "{\"id\":%d,\"nome\":\"%s\",\"url\":\"%s\",\"grupo\":\"%s\",\"tags\":%s,\"notas\":%s}",
-                            l.getId(),
-                            l.getName().replace("\"","\\\""),
-                            l.getUrl().replace("\"","\\\""),
-                            grupo.replace("\"","\\\""),
-                            tagsJson,
-                            notasJson
-                    );
-                })
-                .collect(Collectors.joining(",", "[", "]"));
-    }
-    */
 
     public String getListaLinksJSON() {
         try {

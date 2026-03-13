@@ -134,10 +134,9 @@
 
                     <!-- Backlinks -->
                     <h:panelGroup rendered="#{not empty hiperlinkBean.buscarBacklinks(link)}" styleClass="backlinks">
-                        <div class="backlink-header" onclick="this.nextElementSibling.classList.toggle('open')">
-                            Mencionado em
-                            (#{hiperlinkBean.buscarBacklinks(link).size()})
-                            ⏷
+                        <div class="backlink-header toggle-header">
+                            Mencionado em (#{hiperlinkBean.buscarBacklinks(link).size()})
+                            <span class="toggle-arrow">▼</span>
                         </div>
                         <div class="backlink-list">
                             <ui:repeat value="#{hiperlinkBean.buscarBacklinks(link)}" var="ref">
@@ -164,10 +163,9 @@
 
                     <!-- Notas -->
                     <h:panelGroup rendered="#{not empty link.notasChecklist}" styleClass="notes">
-                        <div class="notes-header" onclick="this.nextElementSibling.classList.toggle('open')">
-                            Notas
-                            (#{link.notasChecklist.size()})
-                            ⏷
+                        <div class="notes-header toggle-header">
+                            Notas (#{link.notasChecklist.size()})
+                            <span class="toggle-arrow">▼</span>
                         </div>
                         <div class="notes-list">
                             <ui:repeat value="#{link.notasChecklist}" var="nota">

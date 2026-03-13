@@ -39,6 +39,7 @@ function scrollParaDestino(){
 $(document).on("pfAjaxComplete", function () {
     document.querySelectorAll(".link-preview")
         .forEach(p => p.remove());
+    initDropdownToggles();
 });
 
 function mostrarPreview(event, element, nome){
@@ -98,6 +99,7 @@ let mentionMenu = null;
 let currentTextarea = null;
 document.addEventListener("DOMContentLoaded", function(){
     mentionMenu = document.getElementById("mention-menu");
+    initDropdownToggles();
     document.addEventListener("input", function(e){
         if (!e.target.classList.contains("mention-editor")) return;
         const textarea = e.target;
@@ -180,4 +182,18 @@ function inserirMention(textarea, valor, antes, pos, nome){
     textarea.value = inicio + valor.substring(pos);
     mentionMenu.style.display="none";
     textarea.focus();
+}
+
+function initDropdownToggles(){
+    document.querySelectorAll(".toggle-header").forEach(header => {
+        header.onclick = () => {
+            const lista = header.nextElementSibling;
+            const arrow = header.querySelector(".toggle-arrow");
+            if (!lista) return;
+            lista.classList.toggle("open");
+            if (arrow){
+                arrow.textContent = lista.classList.contains("open") ? "▲" : "▼";
+            }
+        };
+    });
 }

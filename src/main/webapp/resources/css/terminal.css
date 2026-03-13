@@ -204,13 +204,14 @@ body{
 
 .backlink-header{
     display:flex;
-    justify-content:space-between;
+    align-items:center;
+    cursor:pointer;
 }
 
 .notes-header{
+    display:flex;
+    align-items:center;
     cursor:pointer;
-    font-weight:bold;
-    margin-top:6px;
 }
 
 .notes-list{
@@ -221,4 +222,17 @@ body{
 
 .notes-list.open{
     max-height:500px;
+}
+
+.toggle-header{
+    cursor:pointer;
+    user-select:none;
+    display:flex;
+    align-items:center;
+    gap:6px;
+}
+
+.toggle-arrow{
+    font-size:12px;
+    transition: transform 0.2s ease;
 }

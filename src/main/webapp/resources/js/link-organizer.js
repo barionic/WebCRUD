@@ -42,10 +42,38 @@ $(document).on("pfAjaxComplete", function () {
 });
 
 function mostrarPreview(event, element, nome){
+    const nomeNormalizado = nome.replace("@","").trim().toLowerCase();
     esconderPreview(element);
+    const link = listaLinks.find(l =>
+        l.nome.toLowerCase() === nomeNormalizado
+    );
+    if(!link) return;
     const preview = document.createElement("div");
     preview.className = "link-preview";
-    preview.innerText = nome;
+    let html = `<strong>${link.nome}</strong><br>`;
+    if(link.url){
+        html += `<small>${link.url}</small><br>`;
+    }
+    if(link.tags && link.tags.length > 0){
+        const tags = link.tags.slice(0,3);
+        html += "<em>Tags:</em> ";
+        tags.forEach(t => {
+            html += `#${t} `;
+        });
+        html += "<br>";
+    }
+    if (link.grupo && link.grupo != "Sem Grupo"){
+        html+= `<em>Grupo: ${link.grupo}</em><br>`;
+    }
+    if(link.notas && link.notas.length > 0){
+        const notas = link.notas.slice(0,3)
+        html += "<hr>";
+        html += "<strong>Notas Adicionadas:</strong><br>";
+        notas.forEach(n => {
+            html += `⬤ ${n}<br>`;
+        });
+    }
+    preview.innerHTML = html;
     document.body.appendChild(preview);
     preview.style.left = (event.pageX + 10) + "px";
     preview.style.top = (event.pageY + 10) + "px";
@@ -90,6 +118,12 @@ document.addEventListener("DOMContentLoaded", function(){
             item.onclick=()=>{
                 inserirMention(textarea, valor, antes, pos, nome);
             };
+            item.onmouseenter = (event) =>{
+                mostrarPreview(event, item, nome);
+            }
+            item.onmouseleave = ()=>{
+                esconderPreview(item);
+            }
             mentionMenu.appendChild(item);
         });
         const rect = textarea.getBoundingClientRect();

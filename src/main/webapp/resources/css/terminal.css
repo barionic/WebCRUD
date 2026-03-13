@@ -131,8 +131,15 @@ body{
     padding: 10px;
     border-radius: 6px;
     max-width: 250px;
-    z-index:999;
+    z-index: 999;
     font-size: 0.85rem;
+    max-width: 300px;
+}
+
+.link-preview hr{
+    border:0;
+    border-top:1px solid #444;
+    margin:4px 0;
 }
 
 .card-highlight{

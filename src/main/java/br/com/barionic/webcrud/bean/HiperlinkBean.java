@@ -249,9 +249,36 @@ public class HiperlinkBean implements Serializable {
 
     public String getListaLinksJSON() {
         return lista.stream()
-                .map(l -> String.format("{\"id\":%d,\"nome\":\"%s\"}",
-                        l.getId(),
-                        l.getName().replace("\"", "\\\"")))
+                .map(l -> {
+                    String grupo = l.getGrupo() != null
+                            ? l.getGrupo().getGrupoName()
+                            : "Sem Grupo";
+                    List<String> notas = l.getNotasChecklist()
+                            .stream()
+                            .limit(2)
+                            .map(n -> n.getTexto().replace("\"","\\\""))
+                            .collect(Collectors.toList());
+                    List<String> tags = l.getTags()
+                            .stream()
+                            .limit(3)
+                            .map(t -> t.getTagName().replace("\"","\\\""))
+                            .collect(Collectors.toList());
+                    String tagsJson = tags.stream()
+                            .map(t -> "\"" + t + "\"")
+                            .collect(Collectors.joining(",", "[", "]"));
+                    String notasJson = notas.stream()
+                            .map(n -> "\"" + n + "\"")
+                            .collect(Collectors.joining(",", "[", "]"));
+                    return String.format(
+                            "{\"id\":%d,\"nome\":\"%s\",\"url\":\"%s\",\"grupo\":\"%s\",\"tags\":%s,\"notas\":%s}",
+                            l.getId(),
+                            l.getName().replace("\"","\\\""),
+                            l.getUrl().replace("\"","\\\""),
+                            grupo.replace("\"","\\\""),
+                            tagsJson,
+                            notasJson
+                    );
+                })
                 .collect(Collectors.joining(",", "[", "]"));
     }
 

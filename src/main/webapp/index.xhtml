@@ -44,7 +44,7 @@
                 </h:panelGroup>
                 <p:commandButton value="+ Novo Tópico"
                                  action="#{hiperlinkBean.adicionarNota}"
-                                 process="@form"
+                                 process="@this"
                                  update=":formCadastro:notesContainer"
                                  styleClass="save-button"/>
 
@@ -141,7 +141,10 @@
                         </div>
                         <div class="backlink-list">
                             <ui:repeat value="#{hiperlinkBean.buscarBacklinks(link)}" var="ref">
-                                <div class="backlink-item" onclick="abrirLink('#{ref.name}')">
+                                <div class="backlink-item"
+                                     onclick="abrirLink('#{ref.name}')"
+                                     onmouseenter="mostrarPreview(event, this, '#{ref.name}')"
+                                     onmouseleave="esconderPreview(this)">
                                     ↩ #{ref.name}
                                 </div>
                             </ui:repeat>

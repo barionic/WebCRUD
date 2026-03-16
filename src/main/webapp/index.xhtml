@@ -20,8 +20,37 @@
             <div class="form-grid">
                 <p:inputText value="#{hiperlinkBean.hiperlink.name}"
                              placeholder="Nome do Link" required="true" requiredMessage="Nome é obrigatório" styleClass="input-full"/>
+
                 <p:inputText value="#{hiperlinkBean.hiperlink.url}"
-                             placeholder="URL do Link" required="true" requiredMessage="URL é obrigatória" styleClass="input-full"/>
+                             placeholder="URL do Link" required="true" requiredMessage="URL é obrigatória" styleClass="input-full">
+                    <p:ajax event="keyup" process="@this" listener="#{hiperlinkBean.sugerirTitulo}" update=":formCadastro:sugestaoNome"/>
+                    <p:ajax event="paste" process="@this" listener="#{hiperlinkBean.sugerirTitulo}" update=":formCadastro:sugestaoNome"/>
+                </p:inputText>
+
+                <h:panelGroup id="sugestaoNome">
+                    <h:panelGroup rendered="#{not empty hiperlinkBean.nomeSugerido}" styleClass="nome-sugerido" layout="block">
+                        <div class="linha-titulo">
+                        <strong>
+                            Nome Sugerido: #{hiperlinkBean.nomeSugerido}
+                        </strong>
+                        <p:commandButton icon="pi pi-copy"
+                                         process="@this"
+                                         update="formCadastro"
+                                         action="#{hiperlinkBean.usarNomeSugerido}"
+                                         styleClass="copy-button"
+                                         disabled="#{!hiperlinkBean.temSugestao}"/>
+                        </div>
+                        <div class="linha-preview">
+                            <img src="#{hiperlinkBean.faviconUrl}"
+                                 width="16"
+                                 height="16"
+                                 onerror="this.src='#{request.contextPath}/resources/img/link.png'"/>
+                            <span class="dominio-preview">
+                                #{hiperlinkBean.dominio}
+                            </span>
+                        </div>
+                    </h:panelGroup>
+                </h:panelGroup>
 
                 <h:panelGroup id="notesContainer" layout="block" styleClass="notes-editor">
                     <ui:repeat value="#{hiperlinkBean.notes}" var="nota">

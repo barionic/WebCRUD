@@ -17,6 +17,14 @@ import jakarta.faces.context.FacesContext;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+
+//Imports javax são usados unica e exclusivamente em trustAllCertificates()
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -48,6 +56,7 @@ public class HiperlinkBean implements Serializable {
     private final ObjectMapper mapper = new ObjectMapper();
     private Map<Long, List<Hiperlink>> backlinksCache = new HashMap<>();
     private boolean recentesPrimeiro;
+    private String nomeSugerido;
 
     @Inject
     private HiperlinkFacade facade;
@@ -60,6 +69,7 @@ public class HiperlinkBean implements Serializable {
 
     @PostConstruct
     public void init() {
+        trustAllCertificates();
         hiperlink = new Hiperlink();
         lista = facade.listarTodos();
         grupos = grupoFacade.listarTodos();
@@ -288,6 +298,118 @@ public class HiperlinkBean implements Serializable {
         //impedir comportamento padrão
     }
 
+    public void sugerirTitulo() {
+        System.out.println("URL recebida: " + hiperlink.getUrl());
+        if (hiperlink.getUrl() == null || hiperlink.getUrl().isBlank()){
+            nomeSugerido = null;
+            return;
+        }
+        try {
+            String url = hiperlink.getUrl().trim();
+            if (!url.startsWith("http")){
+                url = "https://" + url;
+            }
+            System.out.println("URL final: " + url);
+            Document doc;
+            try {
+                // 1) Tentativa Direta
+                doc = Jsoup.connect(url)
+                        .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
+                        .referrer("https://www.google.com")
+                        .header("Accept-Language", "en-US,en;q=0.9")
+                        .header("Accept-Encoding", "gzip, deflate")
+                        .header("Connection", "keep-alive")
+                        .timeout(3000)
+                        .maxBodySize(0)
+                        .ignoreContentType(true)
+                        .followRedirects(true)
+                        .get();
+            } catch (Exception e) {
+                // 2) fallback mobile
+                //String previewUrl = "https://textise.net/showtext.aspx?strURL=" + url;
+                doc = Jsoup.connect(url)
+                        .userAgent("Mozilla/5.0 (Linux; Android 10)")
+                        .timeout(8000)
+                        .get();
+            }
+            // 3) Tentar OpenGraph
+            String titulo = doc.select("meta[property=og:title]").attr("content");
+
+            // 4) Fallback para <title>
+            if (titulo == null || titulo.isBlank()){
+                titulo = doc.title();
+            }
+
+            // 5) Fallback StackOverflow / páginas simples
+            if (titulo == null || titulo.isBlank()) {
+                titulo = doc.select("h1").first() != null
+                        ? doc.select("h1").first().text()
+                        : null;
+            }
+
+            // 6) Fallback Final
+            if (titulo == null || titulo.isBlank()){
+                nomeSugerido = "Sem Sugestão Disponível";
+            }else{
+                nomeSugerido = titulo.trim();
+            }
+
+        } catch (Exception e){
+            e.printStackTrace();
+            nomeSugerido = "Sem Sugestão Disponível";
+        }
+    }
+
+    public String getDominio() {
+        if (hiperlink == null || hiperlink.getUrl() == null){
+            return null;
+        }
+        try {
+            String url = hiperlink.getUrl();
+            if(!url.startsWith("http")){
+                url = "https://" + url;
+            }
+            java.net.URI uri = new java.net.URI(url);
+            return uri.getHost();
+        } catch (Exception e){
+            return null;
+        }
+    }
+
+    public String getFaviconUrl() {
+        String dominio = getDominio();
+        if (dominio == null){
+            return null;
+        }
+        return "https://www.google.com/s2/favicons?sz=32&domain=" + dominio;
+    }
+
+    public void usarNomeSugerido() {
+        if (nomeSugerido != null){
+            hiperlink.setName(nomeSugerido);
+        }
+    }
+
+    public boolean isTemSugestao(){
+        return nomeSugerido != null && !nomeSugerido.equals("Sem Sugestão Disponível");
+    }
+
+    public static void trustAllCertificates() {
+        //ATENÇÃO: isso desliga a verificação de segurança HTTPS. Está seguro porque só fazemos get(), nao enviamos dados.
+        try{
+            TrustManager[] trustAllCerts = new TrustManager[]{
+                    new X509TrustManager() {
+                        public java.security.cert.X509Certificate[] getAcceptedIssuers() {return null;}
+                        public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {}
+                        public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {}
+                    }
+            };
+            SSLContext sc = SSLContext.getInstance("TLS");
+            sc.init(null, trustAllCerts, new java.security.SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+        } catch (Exception ignored) {}
+    }
+
     // ==== Getters & Setters ====
     public Hiperlink getHiperlink() {
         return hiperlink;
@@ -410,4 +532,8 @@ public class HiperlinkBean implements Serializable {
     public boolean isRecentesPrimeiro() { return recentesPrimeiro; }
 
     public void setRecentesPrimeiro(boolean recentesPrimeiro) { this.recentesPrimeiro = recentesPrimeiro; }
+
+    public String getNomeSugerido() { return nomeSugerido; }
+
+    public void setNomeSugerido(String nomeSugerido) { this.nomeSugerido = nomeSugerido; }
 }

@@ -19,6 +19,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -26,10 +27,14 @@ import java.util.stream.Collectors;
 @Named("hiperlinkBean")
 @ViewScoped
 public class HiperlinkBean implements Serializable {
+    private Hiperlink hiperlink;
+    private List<Hiperlink> lista;
+    private List<Long> listaIds;
     private List<Grupo> grupos;
     private Long grupoId;
     private List<Tag> tags;
     private List<Long> tagIds;
+    private List<NotaItem> notes = new ArrayList<>();
 
     private String filtroNome;
     private Long filtroGrupoId;
@@ -39,8 +44,11 @@ public class HiperlinkBean implements Serializable {
     private Long grupoSelecionado;
     private boolean mostrarLog = false;
     private boolean modoEdicao = false;
-    private List<Long> listaIds;
     private Map<Long, String> mapaNomes;
+    private final ObjectMapper mapper = new ObjectMapper();
+    private Map<Long, List<Hiperlink>> backlinksCache = new HashMap<>();
+    private boolean recentesPrimeiro;
+
     @Inject
     private HiperlinkFacade facade;
 
@@ -49,12 +57,6 @@ public class HiperlinkBean implements Serializable {
 
     @Inject
     private TagFacade tagFacade;
-
-    private Hiperlink hiperlink;
-    private List<Hiperlink> lista;
-    private List<NotaItem> notes = new ArrayList<>();
-    private final ObjectMapper mapper = new ObjectMapper();
-    private Map<Long, List<Hiperlink>> backlinksCache = new HashMap<>();
 
     @PostConstruct
     public void init() {
@@ -140,6 +142,13 @@ public class HiperlinkBean implements Serializable {
 
     public void buscar() {
         lista = facade.buscarComFiltro(filtroNome, filtroGrupoId, filtroTagId, filtroCor);
+        if (recentesPrimeiro && lista != null) {
+            lista.sort((a, b) -> {
+                LocalDateTime dataA = a.getDataAtualizacao() != null ? a.getDataAtualizacao() : a.getDataCriacao();
+                LocalDateTime dataB = b.getDataAtualizacao() != null ? b.getDataAtualizacao() : b.getDataCriacao();
+                return dataB.compareTo(dataA);
+            });
+        }
         /*
         if (filtroNome != null && filtroNome.length() == 1) {
             FacesContext.getCurrentInstance().addMessage(null,
@@ -397,4 +406,8 @@ public class HiperlinkBean implements Serializable {
     public void setNotes(List<NotaItem> notes) {
         this.notes = notes;
     }
+
+    public boolean isRecentesPrimeiro() { return recentesPrimeiro; }
+
+    public void setRecentesPrimeiro(boolean recentesPrimeiro) { this.recentesPrimeiro = recentesPrimeiro; }
 }

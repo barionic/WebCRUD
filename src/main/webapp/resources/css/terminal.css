@@ -202,12 +202,6 @@ body{
     text-decoration:underline;
 }
 
-.backlink-header{
-    display:flex;
-    align-items:center;
-    cursor:pointer;
-}
-
 .notes-header{
     display:flex;
     align-items:center;

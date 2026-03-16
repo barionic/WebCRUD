@@ -112,6 +112,10 @@
                         <p:inputSwitch value="#{hiperlinkBean.mostrarLog}">
                             <p:ajax update=":formLista:dataViewLinks"/>
                         </p:inputSwitch>
+                        <h:outputText value="Recentes Primeiro?"/>
+                        <p:inputSwitch value="#{hiperlinkBean.recentesPrimeiro}">
+                            <p:ajax listener="#{hiperlinkBean.buscar}" update=":formLista:dataViewLinks"/>
+                        </p:inputSwitch>
                         <p:button value="Ordenar Links" outcome="ordenacao" styleClass="save-button"/>
                     </div>
                 </div>

@@ -274,3 +274,13 @@ body{
     font-size:12px;
     color:#060606;
 }
+
+.link-externo {
+    color: #4da6ff;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.link-externo:hover {
+    text-decoration: underline;
+}

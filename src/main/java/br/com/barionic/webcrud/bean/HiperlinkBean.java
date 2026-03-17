@@ -29,6 +29,7 @@ import javax.net.ssl.X509TrustManager;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -57,6 +58,8 @@ public class HiperlinkBean implements Serializable {
     private Map<Long, List<Hiperlink>> backlinksCache = new HashMap<>();
     private boolean recentesPrimeiro;
     private String nomeSugerido;
+
+    private static final Pattern LINK_EXTERNO_PATTERN = Pattern.compile("@\\[(.+?)\\]\\[(https?://.+?)\\]");
 
     @Inject
     private HiperlinkFacade facade;
@@ -159,14 +162,6 @@ public class HiperlinkBean implements Serializable {
                 return dataB.compareTo(dataA);
             });
         }
-        /*
-        if (filtroNome != null && filtroNome.length() == 1) {
-            FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                            "Type at least 2 characters to search by name.", null));
-
-        }
-        */
     }
 
     public void limparFiltro() {
@@ -237,6 +232,10 @@ public class HiperlinkBean implements Serializable {
     public String formatarNota(String texto) {
         if (texto == null) return "";
 
+        // PRIMEIRO: links externos
+        texto = renderizarLinksExterno(texto);
+
+        //DEPOIS: mentions internas
         List<String> nomes = facade.listarTodos()
                 .stream()
                 .map(Hiperlink::getName)
@@ -250,8 +249,6 @@ public class HiperlinkBean implements Serializable {
             );
         }
 
-        //@([a-zA-Z0-9À-ÿ _-]+)
-        //texto = texto.replaceAll("@([^@]+?)(?=@|$)", "<a href='javascript:void(0)' class='nota-card-link' onclick=\"abrirLink('$1')\" onmouseover=\"mostrarPreview(event,this,'$1')\" onmouseout=\"esconderPreview(this)\">@$1</a>");
         texto = texto.replaceAll("\\*\\*(.*?)\\*\\*", "<b>$1</b>");
         texto = texto.replaceAll("`(.*?)`", "<code>$1</code>");
 
@@ -394,6 +391,8 @@ public class HiperlinkBean implements Serializable {
         return nomeSugerido != null && !nomeSugerido.equals("Sem Sugestão Disponível");
     }
 
+
+
     public static void trustAllCertificates() {
         //ATENÇÃO: isso desliga a verificação de segurança HTTPS. Está seguro porque só fazemos get(), nao enviamos dados.
         try{
@@ -408,6 +407,33 @@ public class HiperlinkBean implements Serializable {
             sc.init(null, trustAllCerts, new java.security.SecureRandom());
             HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
         } catch (Exception ignored) {}
+    }
+
+    public String renderizarTexto(String texto){
+        if (texto == null) {return "";}
+        texto = renderizarLinksExterno(texto);
+
+        return  texto;
+    }
+
+    private String renderizarLinksExterno(String texto){
+        Matcher matcher = LINK_EXTERNO_PATTERN.matcher(texto);
+        StringBuffer sb = new StringBuffer();
+
+        while (matcher.find()) {
+            String nome = matcher.group(1);
+            String url = matcher.group(2);
+
+            if (!url.startsWith("http")) {
+                url = "https://" + url;
+            }
+
+            String html = "<a href='" + url + "' target='_blank' class='link-externo'>@" + nome + "</a>";
+            matcher.appendReplacement(sb, html);
+        }
+
+        matcher.appendTail(sb);
+        return sb.toString();
     }
 
     // ==== Getters & Setters ====

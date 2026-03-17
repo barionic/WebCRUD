@@ -106,6 +106,28 @@ document.addEventListener("DOMContentLoaded", function(){
         const valor = textarea.value;
         const pos = textarea.selectionStart;
         const antes = valor.substring(0, pos);
+
+        // ====== AUTO CONVERTER URL ======
+        const urlMatch = antes.match(/(?<!\]\[)(https?:\/\/[^\s]+)$/);
+        if (urlMatch) {
+            const url = urlMatch[1];
+            try {
+                const urlObj = new URL(url);
+                const nome = urlObj.hostname.replace("www.", "");
+
+                const inicio = antes.replace(url, `@[${nome}][${url}] `);
+                textarea.value = inicio + valor.substring(pos);
+
+                const newPos = inicio.length;
+                textarea.setSelectionRange(newPos, newPos);
+                return; //evita cair no @mention depois
+            } catch (err) {
+                // ignora; best effort feature
+                console.debug("Auto-link skipped (invalid URL):", url); //para nao ficar vazio
+            }
+        }
+
+        // ====== MENTIONS ======
         const match = antes.match(/@([\wÀ-ÿ ]*)$/);
         if (!match){
             mentionMenu.style.display="none";

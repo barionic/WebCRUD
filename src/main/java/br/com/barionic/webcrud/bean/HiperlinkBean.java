@@ -436,6 +436,11 @@ public class HiperlinkBean implements Serializable {
         return sb.toString();
     }
 
+    public void recarregarGruposETags() {
+        this.grupos = grupoFacade.listarTodos();
+        this.tags = tagFacade.listarTodos();
+    }
+
     // ==== Getters & Setters ====
     public Hiperlink getHiperlink() {
         return hiperlink;

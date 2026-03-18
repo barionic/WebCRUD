@@ -15,6 +15,9 @@
         <h1>Link Organizer</h1>
     </div>
     <h:form id="formCadastro">
+        <p:remoteCommand name="reloadRemote"
+                         action="#{hiperlinkBean.recarregarGruposETags}"
+                         update="formCadastro:grupoSelect formCadastro:tagSelect" />
         <p:growl id="growl" showDetail="true" life="3000"/>
         <p:card header="Criar Novo Link" styleClass="main-card">
             <div class="form-grid">
@@ -73,23 +76,23 @@
                 </h:panelGroup>
                 <p:commandButton value="+ Novo Tópico"
                                  action="#{hiperlinkBean.adicionarNota}"
-                                 process="@this"
+                                 process="@form"
                                  update=":formCadastro:notesContainer"
                                  styleClass="save-button"/>
 
-                <p:selectOneMenu value="#{hiperlinkBean.grupoId}" style="width:100%">
+                <p:selectOneMenu id="grupoSelect" value="#{hiperlinkBean.grupoId}" style="width:100%">
                     <f:selectItem itemLabel="Sem Grupo" itemValue="#{null}" />
                     <f:selectItems value="#{hiperlinkBean.grupos}" var="g" itemLabel="#{g.grupoName}"  itemValue="#{g.id}"/>
                 </p:selectOneMenu>
                 <h:panelGroup layout="block" style="margin-top:5px">
-                    <h:link outcome="grupo" value="Gerenciar Grupos"/>
+                    <h:link outcome="grupo" value="Gerenciar Grupos" target="_blank"/>
                 </h:panelGroup>
-                <p:selectCheckboxMenu value="#{hiperlinkBean.tagIds}" label="#{empty hiperlinkBean.tagIds ? 'Sem Tags' : 'Tags Selecionadas'}"
+                <p:selectCheckboxMenu id="tagSelect" value="#{hiperlinkBean.tagIds}" label="#{empty hiperlinkBean.tagIds ? 'Sem Tags' : 'Tags Selecionadas'}"
                                       multiple="true" updateLabel="true" style="width:100%">
                     <f:selectItems value="#{hiperlinkBean.tags}" var="t" itemLabel="#{t.tagName}" itemValue="#{t.id}"/>
                 </p:selectCheckboxMenu>
                 <h:panelGroup layout="block" style="margin-top:5px">
-                    <h:link outcome="tag" value="Gerenciar Tags"/>
+                    <h:link outcome="tag" value="Gerenciar Tags" target="_blank"/>
                 </h:panelGroup>
                 <p:selectOneMenu value="#{hiperlinkBean.hiperlink.color}" style="width:100%">
                     <f:selectItem itemLabel="Selecione uma Cor" itemValue="#{null}"/>

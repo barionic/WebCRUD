@@ -219,3 +219,9 @@ function initDropdownToggles(){
         };
     });
 }
+
+window.addEventListener("focus", function () {
+    if (window.reloadRemote) {
+        reloadRemote();
+    }
+});
